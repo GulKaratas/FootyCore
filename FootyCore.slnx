@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FootyCore.Api/FootyCore.Api.csproj" />
+  <Project Path="FootyCore.WebUI/FootyCore.WebUI.csproj" />
+</Solution>
