@@ -1,6 +1,6 @@
 ﻿namespace FootyCore.WebUI.Dtos.CustomerDto
 {
-    public class GetCustomerById
+    public class GetCustomerByIdDto
     {
         public int customerId { get; set; }
         public string customerName { get; set; }

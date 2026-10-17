@@ -1,0 +1,32 @@
+﻿@model List<ResultCustomerDto>
+@{
+    Layout = null;
+}
+
+<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<div class="container">
+    <br />
+    <table class="table table-bordered">
+        <tr>
+            <th>#</th>
+            <th>Müşteri Adı</th>
+            <th>Müşteri Soyadı</th>
+            <th>Müşteri Şehir</th>
+            <th>Sil</th>
+            <th>Güncelle</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.customerId</td>
+                <td>@item.customerName</td>
+                <td>@item.customerSurname</td>
+                <td>@item.customerCity</td>
+                <td><a href="/Customer/DeleteCustomer/@item.customerId" class="btn btn-danger">Sil</a></td>
+                <td><a href="/Customer/UpdateCustomer/@item.customerId" class="btn btn-success">Güncelle</a></td>
+            </tr>
+        }
+    </table>
+    <a href="/Customer/CreateCustomer/" class="btn btn-info">Yeni Müşteri Girişi</a>
+</div>
