@@ -3,6 +3,9 @@ using FootyCore.Api.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+using Microsoft.EntityFrameworkCore;
+using FootyCore.Api.Dtos.ProductDto;
+
 namespace FootyCore.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -19,14 +22,31 @@ namespace FootyCore.Api.Controllers
         [HttpGet]
         public IActionResult ProductList()
         {
-            var value = _context.Products.ToList();
+            var value = _context.Products.Include(x => x.Category).Select(x => new ResultProductDto
+            {
+
+                ProductId = x.ProductId,
+                ProductName = x.ProductName,
+                Stock = x.Stock,
+                Price = x.Price,
+                CategoryId = x.CategoryId,
+                CategoryName = x.Category.CategoryName
+            }).ToList();
+
             return Ok(value);
         }
 
         [HttpPost]
 
-        public IActionResult CreateProduct(Product product)
+        public IActionResult CreateProduct(CreateProductDto dto)
         {
+            var product = new Product
+            {
+                Price = dto.Price,
+                CategoryId = dto.CategoryId,
+                ProductName = dto.ProductName,
+                Stock = dto.Stock
+            };
             _context.Products.Add(product);
             _context.SaveChanges();
             return Ok("Ürün Eklendi");
@@ -48,13 +68,21 @@ namespace FootyCore.Api.Controllers
             var value = _context.Products.Find(id);
             return Ok(value);
         }
-        [HttpPut]
 
-        public IActionResult UpdateSProduct(Product product) { 
-        
-            _context.Products.Update(product);
+        [HttpPut]
+        public IActionResult UpdateProduct(UpdateProductDto dto)
+        {
+            var value = _context.Products.Find(dto.ProductId);
+
+            value.ProductName = dto.ProductName;
+            value.Stock = dto.Stock;
+            value.Price = dto.Price;
+            value.CategoryId = dto.CategoryId;
+
             _context.SaveChanges();
+
             return Ok("Ürün Güncellendi");
         }
+
     }
 }
