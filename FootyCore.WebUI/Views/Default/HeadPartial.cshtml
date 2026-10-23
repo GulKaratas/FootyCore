@@ -1,0 +1,263 @@
+﻿<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GoalZone — Premier League</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+            :root{
+              --bg:#080d18;--bg2:#0c1220;--card:#111827;--card2:#16202f;--elevated:#1c2d42;
+              --green:#00e676;--blue:#2979ff;--live:#ff1744;--gold:#ffd600;--yellow:#ffc107;--red:#f44336;
+              --t1:#eef2ff;--t2:#7b96c4;--t3:#3d5478;--border:#1a2640;
+              --r1:8px;--r2:12px;--r3:16px;
+              --tr:all .22s cubic-bezier(.4,0,.2,1);
+              --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+            }
+            *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+            html{scroll-behavior:smooth}
+            body{font-family:var(--fb);background:var(--bg);color:var(--t1);min-height:100vh;
+              background-image:
+                radial-gradient(ellipse at 15% 0%,rgba(41,121,255,.07) 0%,transparent 55%),
+                radial-gradient(ellipse at 85% 0%,rgba(0,230,118,.04) 0%,transparent 50%)}
+            ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}
+            ::-webkit-scrollbar-thumb{background:var(--elevated);border-radius:3px}
+            a{text-decoration:none;color:inherit}img{display:block}
+
+            /* ─── NAVBAR ─── */
+            .nb{background:rgba(8,13,24,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+              position:sticky;top:0;z-index:1000;box-shadow:0 2px 24px rgba(0,0,0,.5)}
+            .nb-inner{max-width:1120px;margin:0 auto;padding:0 20px;
+              display:flex;align-items:center;justify-content:space-between;gap:16px}
+            .brand{display:flex;align-items:center;gap:10px;padding:14px 0}
+            .brand-ico{width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--blue));
+              border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px}
+            .brand-txt{font-family:var(--fd);font-size:21px;font-weight:800;letter-spacing:1px}
+            .brand-txt span{color:var(--green)}
+            .nav-links{display:flex}
+            .nl{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+              color:var(--t2);padding:22px 15px;position:relative;transition:var(--tr)}
+            .nl::after{content:'';position:absolute;bottom:0;left:15px;right:15px;height:2px;
+              background:var(--green);transform:scaleX(0);transition:var(--tr)}
+            .nl:hover,.nl.active{color:var(--t1)}.nl:hover::after,.nl.active::after{transform:scaleX(1)}
+            .nb-icons{display:flex;align-items:center;gap:5px}
+            .ico-btn{width:36px;height:36px;background:var(--card);border:1px solid var(--border);
+              border-radius:var(--r1);color:var(--t2);display:flex;align-items:center;
+              justify-content:center;font-size:14px;transition:var(--tr)}
+            .ico-btn:hover{background:var(--elevated);color:var(--t1);border-color:var(--blue)}
+            .tog{background:var(--card);border:1px solid var(--border);border-radius:var(--r1);
+              padding:7px 9px;color:var(--t1);cursor:pointer;line-height:1}
+            .mob-menu{max-height:0;overflow:hidden;transition:max-height .3s ease}
+            .mob-menu.open{max-height:320px}
+            .mob-menu .nl{padding:14px 0;border-bottom:1px solid var(--border);display:block}
+
+            .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+            /* ─── LEAGUE HEADER ─── */
+            .lg-head{background:linear-gradient(135deg,var(--bg2),var(--card));
+              border-bottom:1px solid var(--border);padding:32px 0 24px;position:relative;overflow:hidden}
+            .lg-head::before{content:'';position:absolute;top:-40%;right:-5%;width:380px;height:380px;
+              background:radial-gradient(circle,rgba(0,230,118,.05) 0%,transparent 70%);pointer-events:none}
+            .lg-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,214,0,.09);
+              border:1px solid rgba(255,214,0,.22);border-radius:20px;padding:4px 12px;
+              font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold);
+              text-transform:uppercase;margin-bottom:10px}
+            .lg-title{font-family:var(--fd);font-size:clamp(26px,5vw,42px);font-weight:900;letter-spacing:.5px;line-height:1}
+            .lg-sub{font-size:13px;color:var(--t2);margin-top:6px}
+            .lg-stats{display:flex;gap:24px;align-items:flex-end;justify-content:flex-end;height:100%}
+            .ls-num{font-family:var(--fd);font-size:30px;font-weight:800;color:var(--green);line-height:1}
+            .ls-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+
+            /* ─── FILTER TABS ─── */
+            .ftabs-wrap{background:var(--bg2);border-bottom:1px solid var(--border);
+              position:sticky;top:62px;z-index:99}
+            .ftabs{display:flex;overflow-x:auto;scrollbar-width:none}
+            .ftabs::-webkit-scrollbar{display:none}
+            .ftab{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1.2px;
+              text-transform:uppercase;color:var(--t3);padding:15px 18px;cursor:pointer;
+              border:none;background:transparent;border-bottom:2px solid transparent;
+              transition:var(--tr);white-space:nowrap}
+            .ftab:hover{color:var(--t2);background:rgba(255,255,255,.02)}
+            .ftab.active{color:var(--green);border-bottom-color:var(--green)}
+            .live-dot{display:inline-block;width:6px;height:6px;background:var(--live);
+              border-radius:50%;margin-right:5px;animation:pdot 1.4s ease-in-out infinite}
+            @@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+            .bcnt{background:var(--live);color:#fff;border-radius:9px;font-size:10px;
+              padding:1px 6px;margin-left:5px;font-weight:700}
+
+            /* ─── FEATURED CARD ─── */
+            .feat-wrap{padding:30px 0 6px}
+            .feat-lbl{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;
+              text-transform:uppercase;color:var(--green);margin-bottom:12px;
+              display:flex;align-items:center;gap:8px}
+            .feat-lbl::before{content:'';display:inline-block;width:18px;height:2px;background:var(--green)}
+            .feat-card{background:linear-gradient(135deg,#0d1d38 0%,#13213e 50%,#0d1f30 100%);
+              border:1px solid rgba(41,121,255,.2);border-radius:var(--r3);padding:30px 36px;
+              position:relative;overflow:hidden;transition:var(--tr);display:block;color:inherit}
+            .feat-card:hover{border-color:rgba(41,121,255,.5);transform:translateY(-2px);
+              box-shadow:0 12px 44px rgba(0,0,0,.6);color:inherit}
+            .feat-card::after{content:'★ FEATURED MATCH';position:absolute;top:14px;right:18px;
+              font-family:var(--fd);font-size:9px;font-weight:800;letter-spacing:2px;color:var(--gold);
+              background:rgba(255,214,0,.09);border:1px solid rgba(255,214,0,.2);padding:3px 10px;border-radius:10px}
+            .ft-team{display:flex;flex-direction:column;align-items:center;gap:12px}
+            .ft-logo{width:70px;height:70px;border-radius:50%;background:var(--elevated);
+              border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
+              font-family:var(--fd);font-size:20px;font-weight:900;overflow:hidden}
+            .ft-logo img{width:100%;height:100%;object-fit:contain;padding:6px}
+            .ft-name{font-family:var(--fd);font-size:18px;font-weight:800;text-align:center}
+            .ft-type{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+            .ft-sc-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+            .ft-sc{font-family:var(--fd);font-size:clamp(48px,8vw,72px);font-weight:900;letter-spacing:-3px;
+              line-height:1;background:linear-gradient(180deg,#fff 0%,#9ab5e0 100%);
+              -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+            .ft-stat{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--t3)}
+            .ft-meta{font-size:12px;color:var(--t2);text-align:center;margin-top:4px}
+
+            /* ─── SECTION TITLE ─── */
+            .sec-ttl{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:2px;
+              text-transform:uppercase;color:var(--t3);padding:14px 0 8px;
+              border-top:1px solid var(--border);margin-top:8px;margin-bottom:4px}
+
+            /* ═══════════════════════════════════════════════
+               MATCH CARD  —  tam genişlik, tek satır düzeni
+               ═══════════════════════════════════════════════ */
+            .mc-wrap{margin-bottom:8px}
+
+            /* Kart ana kutu: flex satırı, tam genişlik */
+            .mc{
+              width:100%;
+              display:flex;
+              align-items:center;
+              background:var(--card);
+              border:1px solid var(--border);
+              border-radius:var(--r2);
+              padding:0 18px;
+              min-height:66px;
+              overflow:hidden;
+              transition:var(--tr);
+              color:inherit;
+            }
+            .mc:hover{
+              background:var(--card2);
+              border-color:rgba(41,121,255,.3);
+              transform:translateY(-1px);
+              box-shadow:0 6px 24px rgba(0,0,0,.4);
+              color:inherit;
+            }
+            .mc.live{border-color:rgba(255,23,68,.22);background:linear-gradient(90deg,var(--card),rgba(255,23,68,.03))}
+            .mc.live:hover{border-color:rgba(255,23,68,.45)}
+            .mc.lp{position:relative}
+            .mc.lp::before{content:'';position:absolute;inset:-1px;border-radius:inherit;
+              border:1px solid rgba(255,23,68,.35);animation:pbrd 2s ease-in-out infinite;pointer-events:none}
+            @@keyframes pbrd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0;transform:scale(1.012)}}
+
+            /* Saat / durum sütunu — sabit genişlik */
+            .mc-time{
+              flex-shrink:0;
+              width:74px;
+              display:flex;
+              flex-direction:column;
+              align-items:center;
+              justify-content:center;
+              gap:5px;
+              padding:12px 0;
+            }
+            .mc-min{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t2)}
+            .mc-min.lc{color:var(--live)}
+            .mc-min.bc{color:var(--blue)}
+            .mc-min.yc{color:var(--yellow)}
+            .sbadge{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.8px;
+              text-transform:uppercase;padding:2px 7px;border-radius:9px;white-space:nowrap}
+            .sb-fin{background:rgba(143,163,200,.09);color:var(--t3)}
+            .sb-live{background:rgba(255,23,68,.11);color:var(--live);border:1px solid rgba(255,23,68,.2);
+              display:flex;align-items:center;gap:3px}
+            .sb-up{background:rgba(41,121,255,.1);color:var(--blue)}
+            .sb-ht{background:rgba(255,193,7,.1);color:var(--yellow)}
+
+            /* Dikey çizgi */
+            .dvv{width:1px;height:44px;background:var(--border);flex-shrink:0;margin:0 16px}
+
+            /* Takımlar bloğu — kalan tüm alanı kaplar */
+            .mc-teams{
+              flex:1;           /* ← kritik: tüm boş alanı al */
+              min-width:0;      /* flex overflow koruması */
+              display:flex;
+              flex-direction:column;
+            }
+
+            /* Tek takım satırı */
+            .mc-tr{
+              display:flex;
+              align-items:center;
+              gap:10px;
+              padding:5px 0;
+            }
+            .mc-tr:first-child{border-bottom:1px solid rgba(255,255,255,.04)}
+
+            .tl-sm{width:26px;height:26px;border-radius:50%;background:var(--elevated);
+              border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+              font-family:var(--fd);font-size:9px;font-weight:800;color:var(--t2);
+              flex-shrink:0;overflow:hidden}
+            .tl-sm img{width:100%;height:100%;object-fit:contain;padding:3px}
+
+            /* Takım adı — esner, taşarsa kes */
+            .tn{
+              font-family:var(--fd);font-size:16px;font-weight:700;letter-spacing:.2px;
+              flex:1;
+              min-width:0;
+              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+            }
+
+            /* Skor — sağa yapışık */
+            .ts{
+              font-family:var(--fd);font-size:22px;font-weight:900;
+              color:var(--t1);min-width:26px;text-align:right;flex-shrink:0;
+            }
+            .ts.win{color:var(--green)}
+            .ts.dim{font-size:15px;color:var(--t3)}
+
+            /* Detay butonu — kartın en sağı */
+            .det-btn{
+              flex-shrink:0;
+              margin-left:16px;
+              display:inline-flex;align-items:center;gap:5px;
+              background:rgba(41,121,255,.08);border:1px solid rgba(41,121,255,.2);
+              color:var(--blue);border-radius:var(--r1);padding:6px 13px;
+              font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:1px;
+              text-transform:uppercase;cursor:pointer;transition:var(--tr);white-space:nowrap;
+            }
+            .det-btn:hover{background:rgba(41,121,255,.18);color:var(--blue)}
+
+            /* ─── FOOTER ─── */
+            .ft{background:var(--bg2);border-top:1px solid var(--border);padding:44px 0 22px;margin-top:36px}
+            .ft-brand{font-family:var(--fd);font-size:20px;font-weight:800;margin-bottom:8px}
+            .ft-brand span{color:var(--green)}
+            .ft-desc{font-size:12px;color:var(--t3);line-height:1.7;max-width:240px}
+            .ft-h{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;
+              text-transform:uppercase;color:var(--t2);margin-bottom:14px}
+            .ft-ul{list-style:none;padding:0}.ft-ul li{margin-bottom:7px}
+            .ft-ul a{color:var(--t3);font-size:12px;transition:var(--tr)}.ft-ul a:hover{color:var(--t1)}
+            .si-row{display:flex;gap:7px;margin-top:14px}
+            .si{width:34px;height:34px;background:var(--card);border:1px solid var(--border);
+              border-radius:var(--r1);display:flex;align-items:center;justify-content:center;
+              color:var(--t3);transition:var(--tr);font-size:13px}
+            .si:hover{background:var(--elevated);color:var(--green);border-color:var(--green)}
+            .ft-bot{border-top:1px solid var(--border);padding-top:18px;margin-top:32px;
+              font-size:11px;color:var(--t3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+
+            /* ─── RESPONSIVE ─── */
+            @@media(max - width:600px){
+              .tn{font-size:13px}
+              .ts{font-size:18px}
+              .mc-time{width:60px}
+              .dvv{margin:0 10px}
+              .det-btn{padding:5px 8px;font-size:9px}
+              .det-btn span{display:none}
+              .feat-card{padding:20px 14px}
+              .ft-logo{width:52px;height:52px}
+              .ft-name{font-size:14px}
+              .ft-sc{font-size:44px}
+              .lg-stats{display:none}
+            }
+    </style>
+</head>

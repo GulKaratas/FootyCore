@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+@await Html.PartialAsync("~/Views/Default/HeadPartial.cshtml")
+<body>
+
+    @await Html.PartialAsync("~/Views/Default/NavbarPartial.cshtml")
+
+    @await Html.PartialAsync("~/Views/Default/TopbarPartial.cshtml")
+
+   @await Html.PartialAsync("~/Views/Default/FilterPartial.cshtml")
+
+    <main>
+        @RenderBody()
+    </main>
+
+   @await Html.PartialAsync("~/Views/Default/FooterPartial.cshtml")
+   @await Html.PartialAsync("~/Views/Default/ScriptPartial.cshtml")
+
+    
+</body>
+</html>

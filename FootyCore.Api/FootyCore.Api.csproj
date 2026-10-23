@@ -20,4 +20,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FootyCore.BusinessLayer\FootyCore.BusinessLayer.csproj" />
+    <ProjectReference Include="..\FootyCore.DataAccessLayer\FootyCore.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\FootyCore.DtoLayer\FootyCore.DtoLayer.csproj" />
+    <ProjectReference Include="..\FootyCoreApi.EntityLayer\FootyCore.EntityLayer.csproj" />
+  </ItemGroup>
+
 </Project>
