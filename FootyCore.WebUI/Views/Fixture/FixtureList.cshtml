@@ -1,0 +1,153 @@
+﻿
+@{
+     ViewData["Title"] = "FixtureList";
+     Layout = "~/Views/Default/_IndexLayout.cshtml";
+}
+
+
+<section class="pg-head">
+  <div class="wrap">
+    <div class="row align-items-end">
+      <div class="col-lg-7">
+        <div class="pg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
+        <h1 class="pg-title">Hafta <span style="color:var(--blue)">34</span> Fikstürü</h1>
+        <p class="pg-sub">18 Nisan – 20 Nisan 2025 &nbsp;·&nbsp; 10 Maç</p>
+        <div class="week-nav">
+          <button class="wn-btn"><i class="bi bi-chevron-left"></i> <span>Hafta 33</span></button>
+          <div class="wn-cur">Hafta 34</div>
+          <button class="wn-btn"><span>Hafta 35</span> <i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+      
+      <!-- Sezon ve Hafta Seçim Alanı -->
+      <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="match-filter-box">
+          <div class="mf-header">
+            <span class="mf-icon"><i class="bi bi-filter-circle-fill"></i></span>
+            <span>Fikstür Filtreleme</span>
+          </div>
+          <div class="mf-selectors-grid">
+            <!-- Sezon Seçim Kutusu -->
+            <div class="mf-item">
+              <label class="mf-lbl" for="seasonSelect">Sezon</label>
+              <div class="mf-select-wrapper">
+                <select id="seasonSelect" class="mf-select">
+                  <option value="2025" selected>2024/25</option>
+                  <option value="2024">2023/24</option>
+                  <option value="2023">2022/23</option>
+                </select>
+                <i class="bi bi-chevron-down mf-caret"></i>
+              </div>
+            </div>
+            
+            <!-- Hafta Seçim Kutusu -->
+            <div class="mf-item">
+              <label class="mf-lbl" for="weekSelect">Hafta</label>
+              <div class="mf-select-wrapper">
+                <select id="weekSelect" class="mf-select">
+                  <option value="34" selected>Hafta 34</option>
+                  <option value="33">Hafta 33</option>
+                  <option value="35">Hafta 35</option>
+                  <!-- Diğer haftalar buraya eklenebilir -->
+                </select>
+                <i class="bi bi-chevron-down mf-caret"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- MAIN -->
+<main>
+<div class="wrap">
+<div class="content">
+
+  <!-- WEEK SUMMARY -->
+  <div class="week-summary">
+    <div class="ws-card">
+      <div class="ws-num" style="color:var(--blue)">10</div>
+      <div class="ws-lbl">Toplam Maç</div>
+    </div>
+    <div class="ws-card">
+      <div class="ws-num" style="color:var(--gold)">3</div>
+      <div class="ws-lbl">Zirve Derbisi</div>
+    </div>
+    <div class="ws-card">
+      <div class="ws-num" style="color:var(--green)">Cum–Paz</div>
+      <div class="ws-lbl">Maç Günleri</div>
+    </div>
+    <div class="ws-card">
+      <div class="ws-num" style="color:var(--live)">18</div>
+      <div class="ws-lbl">Nisan 2025</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ FRIDAY ═══════════════ -->
+  <div class="day-group">
+    <div class="day-header">
+      <span class="day-title">Cuma</span>
+      <span class="day-date">18 Nisan 2025</span>
+      <div class="day-line"></div>
+      <span class="day-badge db-today">Bu Hafta Açılışı</span>
+    </div>
+
+    <!-- Man City vs Chelsea — TOP MATCH -->
+    <div class="fx-card top-match">
+      <div class="fx-top-badge"></div>
+      <div class="fx-inner">
+        <div class="fx-time-col">
+          <div class="fx-time">20:00</div>
+          <div class="top-match-tag">★ TOP</div>
+        </div>
+        <div class="fx-divider"></div>
+        <div class="fx-teams">
+          <div class="fx-team-home">
+            <span class="fx-name home">Manchester City</span>
+            <div class="fx-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg" alt="MCI" onerror="this.parentNode.textContent='MCI'"/>
+            </div>
+          </div>
+          <div class="vs-block">
+            <span class="vs-text">VS</span>
+          </div>
+          <div class="fx-team-away">
+            <div class="fx-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="CHE" onerror="this.parentNode.textContent='CHE'"/>
+            </div>
+            <span class="fx-name">Chelsea</span>
+          </div>
+        </div>
+        <div class="fx-right">
+          <span class="fx-stadium"><i class="bi bi-geo-alt" style="font-size:10px;margin-right:3px"></i>Etihad Stadium</span>
+          <button class="notify-btn" onclick="toggleNotify(this)">
+            <i class="bi bi-bell"></i> <span>Bildir</span>
+          </button>
+        </div>
+      </div>
+      <div class="h2h-strip">
+        <span class="h2h-label">Son 5 Karşılaşma</span>
+        <div class="h2h-pills">
+          <div class="h2h-p h2h-w">G</div>
+          <div class="h2h-p h2h-l">M</div>
+          <div class="h2h-p h2h-w">G</div>
+          <div class="h2h-p h2h-d">B</div>
+          <div class="h2h-p h2h-w">G</div>
+        </div>
+        <span class="h2h-avg">Ort. 2.8 gol / maç</span>
+      </div>
+      <div class="kp-strip">
+        <span class="kp-label">İzlenecek Oyuncular</span>
+        <span class="kp-tag"><i class="bi bi-lightning-fill"></i>Erling Haaland</span>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+</main>
+

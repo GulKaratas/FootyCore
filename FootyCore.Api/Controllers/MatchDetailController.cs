@@ -1,6 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using FootyCore.DtoLayer.MatchDetailDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.Api.Controllers
@@ -9,7 +8,6 @@ namespace FootyCore.Api.Controllers
     [ApiController]
     public class MatchDetailController : ControllerBase
     {
-
         private readonly IMatchDetailService _matchDetailService;
 
         public MatchDetailController(IMatchDetailService matchDetailService)
@@ -18,38 +16,38 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult MatchDetailList()
+        public async Task<IActionResult> MatchDetailList()
         {
-            var value = _matchDetailService.TGetList();
+            var value = await _matchDetailService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteMatchDetail(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMatchDetail(int id)
         {
-            var value = _matchDetailService.TGetById(id);
-            _matchDetailService.TDelete(value);
-            return Ok(value);
+            await _matchDetailService.TDelete(id);
+            return Ok("Maç Detayları Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddMatchDetail(MatchDetail matchDetail)
+        public async Task<IActionResult> AddMatchDetail(CreateMatchDetailDto dto)
         {
-            _matchDetailService.TInsert(matchDetail);
-            return Ok();
+            await _matchDetailService.TInsert(dto);
+            return Ok("Maç Detayları Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateMatchDetail(MatchDetail matchDetail)
+        public async Task<IActionResult> UpdateMatchDetail(UpdateMatchDetailDto dto)
         {
-            _matchDetailService.TUpdate(matchDetail);
-            return Ok();
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetMatchDetail(int id)
-        {
-            var value = _matchDetailService.TGetById(id);
-            return Ok(value);
+            await _matchDetailService.TUpdate(dto);
+            return Ok("Maç Detayları Başarıyla Güncellendi");
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMatchDetail(int id)
+        {
+            var value = await _matchDetailService.TGetById(id);
+            return Ok(value);
+        }
     }
 }

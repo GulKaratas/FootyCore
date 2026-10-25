@@ -1,6 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using FootyCore.DtoLayer.MatchStatusDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.Api.Controllers
@@ -9,7 +8,6 @@ namespace FootyCore.Api.Controllers
     [ApiController]
     public class MatchStatusController : ControllerBase
     {
-
         private readonly IMatchStatusService _matchStatusService;
 
         public MatchStatusController(IMatchStatusService matchStatusService)
@@ -18,38 +16,38 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult MatchStatusList()
+        public async Task<IActionResult> MatchStatusList()
         {
-            var value = _matchStatusService.TGetList();
+            var value = await _matchStatusService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteMatchStatus(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMatchStatus(int id)
         {
-            var value = _matchStatusService.TGetById(id);
-            _matchStatusService.TDelete(value);
-            return Ok(value);
+            await _matchStatusService.TDelete(id);
+            return Ok("Maç Durumları Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddMatchStatus(MatchStatus matchStatus)
+        public async Task<IActionResult> AddMatchStatus(CreateMatchStatusDto dto)
         {
-            _matchStatusService.TInsert(matchStatus);
-            return Ok();
+            await _matchStatusService.TInsert(dto);
+            return Ok("Maç Durumları Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateMatchStatus(MatchStatus matchStatus)
+        public async Task<IActionResult> UpdateMatchStatus(UpdateMatchStatusDto dto)
         {
-            _matchStatusService.TUpdate(matchStatus);
-            return Ok();
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetMatchStatus(int id)
-        {
-            var value = _matchStatusService.TGetById(id);
-            return Ok(value);
+            await _matchStatusService.TUpdate(dto);
+            return Ok("Maç Durumları Başarıyla Güncellendi");
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMatchStatus(int id)
+        {
+            var value = await _matchStatusService.TGetById(id);
+            return Ok(value);
+        }
     }
 }

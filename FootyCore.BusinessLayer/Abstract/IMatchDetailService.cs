@@ -1,4 +1,5 @@
-﻿using FootyCore.EntityLayer.Entities;
+﻿using FootyCore.DtoLayer.MatchDetailDto;
+using FootyCore.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FootyCore.BusinessLayer.Abstract
 {
-    public interface IMatchDetailService : IGenericService<MatchDetail>
+    public interface IMatchDetailService : IGenericService<ResultMatchDetailDto,CreateMatchDetailDto, UpdateMatchDetailDto,GetMatchDetailByIdDto>
     {
     }
 }

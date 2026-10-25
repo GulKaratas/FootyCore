@@ -1,4 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DtoLayer.MatchDetailDto;
 using FootyCore.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,27 +11,27 @@ namespace FootyCore.BusinessLayer.Concrete
 {
     public class MatchDetailManager : IMatchDetailService
     {
-        public void TDelete(MatchDetail t)
+        public Task TDelete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public MatchDetail TGetById(int id)
+        public Task<GetMatchDetailByIdDto> TGetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public List<MatchDetail> TGetList()
+        public Task<List<ResultMatchDetailDto>> TGetList()
         {
             throw new NotImplementedException();
         }
 
-        public void TInsert(MatchDetail t)
+        public Task TInsert(CreateMatchDetailDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public void TUpdate(MatchDetail t)
+        public Task TUpdate(UpdateMatchDetailDto dto)
         {
             throw new NotImplementedException();
         }

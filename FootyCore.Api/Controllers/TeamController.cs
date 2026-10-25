@@ -1,6 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using FootyCore.DtoLayer.TeamDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.Api.Controllers
@@ -9,7 +8,6 @@ namespace FootyCore.Api.Controllers
     [ApiController]
     public class TeamController : ControllerBase
     {
-
         private readonly ITeamService _teamService;
 
         public TeamController(ITeamService teamService)
@@ -18,38 +16,38 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult TeamList()
+        public async Task<IActionResult> TeamList()
         {
-            var value = _teamService.TGetList();
+            var value = await _teamService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteTeam(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTeam(int id)
         {
-            var value = _teamService.TGetById(id);
-            _teamService.TDelete(value);
-            return Ok(value);
+            await _teamService.TDelete(id);
+            return Ok("Takım Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddTeam(Team team)
+        public async Task<IActionResult> AddTeam(CreateTeamDto dto)
         {
-            _teamService.TInsert(team);
-            return Ok();
+            await _teamService.TInsert(dto);
+            return Ok("Takım Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateTeam(Team team)
+        public async Task<IActionResult> UpdateTeam(UpdateTeamDto dto)
         {
-            _teamService.TUpdate(team);
-            return Ok();
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetTeam(int id)
-        {
-            var value = _teamService.TGetById(id);
-            return Ok(value);
+            await _teamService.TUpdate(dto);
+            return Ok("Takım Başarıyla Silindi");
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTeam(int id)
+        {
+            var value = await _teamService.TGetById(id);
+            return Ok(value);
+        }
     }
 }

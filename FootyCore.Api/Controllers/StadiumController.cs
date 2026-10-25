@@ -1,6 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using FootyCore.DtoLayer.StadiumDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.Api.Controllers
@@ -9,7 +8,6 @@ namespace FootyCore.Api.Controllers
     [ApiController]
     public class StadiumController : ControllerBase
     {
-
         private readonly IStadiumService _stadiumService;
 
         public StadiumController(IStadiumService stadiumService)
@@ -18,38 +16,38 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult StadiumList()
+        public async Task<IActionResult> StadiumList()
         {
-            var value = _stadiumService.TGetList();
+            var value = await _stadiumService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteStadium(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStadium(int id)
         {
-            var value = _stadiumService.TGetById(id);
-            _stadiumService.TDelete(value);
-            return Ok(value);
+            await _stadiumService.TDelete(id);
+            return Ok("Stadyum Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddStadium(Stadium stadium)
+        public async Task<IActionResult> AddStadium(CreateStadiumDto dto)
         {
-            _stadiumService.TInsert(stadium);
-            return Ok();
+            await _stadiumService.TInsert(dto);
+            return Ok("Stadyum Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateStadium(Stadium stadium)
+        public async Task<IActionResult> UpdateStadium(UpdateStadiumDto dto)
         {
-            _stadiumService.TUpdate(stadium);
-            return Ok();
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetStadium(int id)
-        {
-            var value = _stadiumService.TGetById(id);
-            return Ok(value);
+            await _stadiumService.TUpdate(dto);
+            return Ok("Stadyum Başarıyla Güncellendi");
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStadium(int id)
+        {
+            var value = await _stadiumService.TGetById(id);
+            return Ok(value);
+        }
     }
 }

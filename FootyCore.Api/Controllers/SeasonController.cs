@@ -1,6 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using FootyCore.DtoLayer.SeasonDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.Api.Controllers
@@ -9,7 +8,6 @@ namespace FootyCore.Api.Controllers
     [ApiController]
     public class SeasonController : ControllerBase
     {
-
         private readonly ISeasonService _seasonService;
 
         public SeasonController(ISeasonService seasonService)
@@ -18,38 +16,38 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult SeasonList()
+        public async Task<IActionResult> SeasonList()
         {
-            var value = _seasonService.TGetList();
+            var value = await _seasonService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteSeason(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSeason(int id)
         {
-            var value = _seasonService.TGetById(id);
-            _seasonService.TDelete(value);
-            return Ok(value);
+            await _seasonService.TDelete(id);
+            return Ok("Sezon Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddSeason(Season season)
+        public async Task<IActionResult> AddSeason(CreateSeasonDto dto)
         {
-            _seasonService.TInsert(season);
-            return Ok();
+            await _seasonService.TInsert(dto);
+            return Ok("Sezon Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateSeason(Season season)
+        public async Task<IActionResult> UpdateSeason(UpdateSeasonDto dto)
         {
-            _seasonService.TUpdate(season);
-            return Ok();
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetSeason(int id)
-        {
-            var value = _seasonService.TGetById(id);
-            return Ok(value);
+            await _seasonService.TUpdate(dto);
+            return Ok("Sezon Başarıyla Güncellendi");
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSeason(int id)
+        {
+            var value = await _seasonService.TGetById(id);
+            return Ok(value);
+        }
     }
 }

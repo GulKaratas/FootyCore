@@ -1,4 +1,5 @@
-﻿using FootyCore.EntityLayer.Entities;
+﻿using FootyCore.DtoLayer.SeasonDto;
+using FootyCore.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FootyCore.BusinessLayer.Abstract
 {
-    public interface ISeasonService : IGenericService<Season>
+    public interface ISeasonService : IGenericService<ResultSeasonDto, CreateSeasonDto,UpdateSeasonDto,GetSeasonByIdDto>
     {
     }
 }

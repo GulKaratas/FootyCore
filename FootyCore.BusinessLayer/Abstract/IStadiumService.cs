@@ -1,13 +1,8 @@
-﻿using FootyCore.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FootyCore.DtoLayer.StadiumDto;
 
 namespace FootyCore.BusinessLayer.Abstract
 {
-    public interface IStadiumService : IGenericService<Stadium>
+    public interface IStadiumService : IGenericService<ResultStadiumDto, CreateStadiumDto, UpdateStadiumDto, GetStadiumByIdDto>
     {
     }
 }

@@ -1,6 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using FootyCore.DtoLayer.MatchStatisticDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.Api.Controllers
@@ -9,7 +8,6 @@ namespace FootyCore.Api.Controllers
     [ApiController]
     public class MatchStatisticController : ControllerBase
     {
-
         private readonly IMatchStatisticService _matchStatisticService;
 
         public MatchStatisticController(IMatchStatisticService matchStatisticService)
@@ -18,38 +16,38 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult MatchStatisticList()
+        public async Task<IActionResult> MatchStatisticList()
         {
-            var value = _matchStatisticService.TGetList();
+            var value = await _matchStatisticService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteMatchStatistic(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMatchStatistic(int id)
         {
-            var value = _matchStatisticService.TGetById(id);
-            _matchStatisticService.TDelete(value);
-            return Ok(value);
+            await _matchStatisticService.TDelete(id);
+            return Ok("Maç İstatistikleri Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddMatchStatistic(MatchStatistic matchStatistic)
+        public async Task<IActionResult> AddMatchStatistic(CreateMatchStatisticDto dto)
         {
-            _matchStatisticService.TInsert(matchStatistic);
-            return Ok();
+            await _matchStatisticService.TInsert(dto);
+            return Ok("Maç İstatistikleri Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateMatchStatistic(MatchStatistic matchStatistic)
+        public async Task<IActionResult> UpdateMatchStatistic(UpdateMatchStatisticDto dto)
         {
-            _matchStatisticService.TUpdate(matchStatistic);
-            return Ok();
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetMatchStatistic(int id)
-        {
-            var value = _matchStatisticService.TGetById(id);
-            return Ok(value);
+            await _matchStatisticService.TUpdate(dto);
+            return Ok("Maç İstatistikleri Başarıyla Güncellendi");
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMatchStatistic(int id)
+        {
+            var value = await _matchStatisticService.TGetById(id);
+            return Ok(value);
+        }
     }
 }

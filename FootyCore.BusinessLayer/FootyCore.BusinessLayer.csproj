@@ -8,11 +8,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FootyCore.DataAccessLayer\FootyCore.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\FootyCore.DtoLayer\FootyCore.DtoLayer.csproj" />
     <ProjectReference Include="..\FootyCoreApi.EntityLayer\FootyCore.EntityLayer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Validation\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.2.0" />
   </ItemGroup>
 
 </Project>

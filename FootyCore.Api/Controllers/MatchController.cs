@@ -1,6 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using FootyCore.DtoLayer.MatchDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.Api.Controllers
@@ -17,38 +16,40 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult MatchList()
+        public async Task<IActionResult> MatchList()
         {
-            var value = _matchService.TGetList();
+            var value = await _matchService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteMatch(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMatch(int id)
         {
-            var value = _matchService.TGetById(id);
-            _matchService.TDelete(value);
-            return Ok(value);
+            await _matchService.TDelete(id);
+            return Ok("Maç Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddMatch(Match match)
+        public async Task<IActionResult> AddMatch(CreateMatchDto dto)
         {
-            _matchService.TInsert(match);
-            return Ok();
+            await _matchService.TInsert(dto);
+            return Ok("Maç Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateMatch(Match match)
+        public async Task<IActionResult> UpdateMatch(UpdateMatchDto dto)
         {
-            _matchService.TUpdate(match);
-            return Ok();
+            await _matchService.TUpdate(dto);
+            return Ok("Maç Başarıyla Güncellendi");
         }
+
         [HttpGet("{id}")]
-        public IActionResult GetMatch(int id)
+        public async Task<IActionResult> GetMatch(int id)
         {
-            var value = _matchService.TGetById(id);
+            var value = await _matchService.TGetById(id);
             return Ok(value);
         }
 
+       
     }
 }

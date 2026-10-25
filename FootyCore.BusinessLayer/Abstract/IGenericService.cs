@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace FootyCore.BusinessLayer.Abstract
 {
-    public interface IGenericService<T> where T : class
+    public interface IGenericService<TResultDto, TCreateDto, TUpdateDto, TGetByIdDto>
     {
-        void TInsert(T t);
-        void TUpdate(T t);
-        void TDelete(T t);
-        List<T> TGetList();
-        T TGetById(int id);
+        Task<List<TResultDto>> TGetList();
+        Task<TGetByIdDto> TGetById(int id);
+        Task TInsert(TCreateDto dto);
+        Task TUpdate(TUpdateDto dto);
+        Task TDelete(int id);
     }
 }

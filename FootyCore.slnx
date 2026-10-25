@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="FootyCore.Api/FootyCore.Api.csproj" />
+  <Project Path="FootyCore.Api/FootyCore.Api.csproj" DefaultStartup="true" />
   <Project Path="FootyCore.BusinessLayer/FootyCore.BusinessLayer.csproj" Id="ff57356e-9068-48e4-9b90-d1c94a6b7dc5" />
   <Project Path="FootyCore.DataAccessLayer/FootyCore.DataAccessLayer.csproj" Id="824bb0a5-8695-4a6c-8ae6-f619b9d9b5c5" />
   <Project Path="FootyCore.DtoLayer/FootyCore.DtoLayer.csproj" Id="d2552c88-ff1c-40ae-9913-44389104abb0" />

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DtoLayer.LeagueDto;
 using Microsoft.AspNetCore.Mvc;
-using FootyCore.BusinessLayer.Abstract;
-using FootyCore.EntityLayer.Entities;
+
 namespace FootyCore.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -16,38 +16,38 @@ namespace FootyCore.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult LeagueList()
+        public async Task<IActionResult> LeagueList()
         {
-            var value = _leagueService.TGetList();
+            var value = await _leagueService.TGetList();
             return Ok(value);
         }
-        [HttpDelete]
-        public IActionResult DeleteLeague(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteLeague(int id)
         {
-            var value = _leagueService.TGetById(id);
-            _leagueService.TDelete(value);
-            return Ok(value);
+            await _leagueService.TDelete(id);
+            return Ok("Lig Başarıyla Silindi");
         }
 
         [HttpPost]
-        public IActionResult AddLeague(League league)
+        public async Task<IActionResult> AddLeague(CreateLeagueDto dto)
         {
-            _leagueService.TInsert(league);
-            return Ok();
+            await _leagueService.TInsert(dto);
+            return Ok("Lig Başarıyla Eklendi");
         }
 
         [HttpPut]
-        public IActionResult UpdateLeague(League league)
+        public async Task<IActionResult> UpdateLeague(UpdateLeagueDto dto)
         {
-            _leagueService.TUpdate(league);
-            return Ok();
+            await _leagueService.TUpdate(dto);
+            return Ok("Lig Başarıyla Güncellendi");
         }
+
         [HttpGet("{id}")]
-        public IActionResult GetLeague(int id) 
+        public async Task<IActionResult> GetLeague(int id)
         {
-            var value = _leagueService.TGetById(id);
+            var value = await _leagueService.TGetById(id);
             return Ok(value);
         }
-        
     }
 }

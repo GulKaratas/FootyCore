@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FootyCore.DataAccessLayer.Abstract
+﻿namespace FootyCore.DataAccessLayer.Abstract
 {
     public interface IGenericDal<T> where T : class
     {
-        void Insert(T t);
-        void Update(T t);
-        void Delete(T t);
-        List<T> GetList();
-        T GetById(int id);
+        Task Insert(T t);
+        Task Update(T t);
+        Task Delete(int id);
+        Task<List<T>> GetList();
+        Task<T> GetById(int id);
     }
 }

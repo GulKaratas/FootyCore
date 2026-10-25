@@ -1,4 +1,5 @@
 ﻿using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DtoLayer.SeasonDto;
 using FootyCore.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,27 +11,27 @@ namespace FootyCore.BusinessLayer.Concrete
 {
     public class SeasonManager : ISeasonService
     {
-        public void TDelete(Season t)
+        public Task TDelete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Season TGetById(int id)
+        public Task<GetSeasonByIdDto> TGetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public List<Season> TGetList()
+        public Task<List<ResultSeasonDto>> TGetList()
         {
             throw new NotImplementedException();
         }
 
-        public void TInsert(Season t)
+        public Task TInsert(CreateSeasonDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public void TUpdate(Season t)
+        public Task TUpdate(UpdateSeasonDto dto)
         {
             throw new NotImplementedException();
         }

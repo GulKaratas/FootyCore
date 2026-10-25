@@ -8,7 +8,7 @@ namespace FootyCore.EntityLayer.Entities
 {
     public class MatchDetail
     {
-         public int MatchDetailId { get; set; }
+        public int MatchDetailId { get; set; }
 
         public int MatchId { get; set; }
         public Match Match { get; set; }

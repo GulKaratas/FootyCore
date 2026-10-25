@@ -2,9 +2,10 @@
 
 using FootyCore.BusinessLayer.Abstract;
 using FootyCore.BusinessLayer.Concrete;
+using FootyCore.BusinessLayer.Mapping;
 using FootyCore.DataAccessLayer.Abstract;
+using FootyCore.DataAccessLayer.Concrete;
 using FootyCore.DataAccessLayer.EntityFramework;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,9 @@ builder.Services.AddScoped<IStadiumDal, EfStadiumDal>();
 
 builder.Services.AddScoped<ITeamService, TeamManager>();
 builder.Services.AddScoped<ITeamDal, EfTeamDal>();
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(GeneralMapping)); 
+builder.Services.AddDbContext<FootyContext>();
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("FootyCore", opts =>

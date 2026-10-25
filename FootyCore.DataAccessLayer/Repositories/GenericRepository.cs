@@ -1,10 +1,6 @@
 ﻿using FootyCore.DataAccessLayer.Abstract;
 using FootyCore.DataAccessLayer.Concrete;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace FootyCore.DataAccessLayer.Repositories
 {
@@ -16,32 +12,39 @@ namespace FootyCore.DataAccessLayer.Repositories
         {
             _context = context;
         }
-        public void Delete(T t)
+
+        public async Task Delete(int id)
         {
-            _context.Remove(t);
-            _context.SaveChanges();
+            var value = await _context.Set<T>().FindAsync(id);
+            if (value == null)
+            {
+                return;
+            }
+
+            _context.Remove(value);
+            await _context.SaveChangesAsync();
         }
 
-        public T GetById(int id)
+        public async Task<T> GetById(int id)
         {
-            return _context.Set<T>().Find(id);
+            return await _context.Set<T>().FindAsync(id);
         }
 
-        public List<T> GetList()
+        public async Task<List<T>> GetList()
         {
-            return _context.Set<T>().ToList();
+            return await _context.Set<T>().ToListAsync();
         }
 
-        public void Insert(T t)
+        public async Task Insert(T t)
         {
-            _context.Add(t);
-            _context.SaveChanges();
+            await _context.AddAsync(t);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(T t)
+        public async Task Update(T t)
         {
             _context.Update(t);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

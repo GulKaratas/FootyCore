@@ -32,3 +32,225 @@
               });
             });
     </script>
+
+<script>
+// Mobile nav
+const tog = document.getElementById('tog');
+const mob = document.getElementById('mobMenu');
+tog.addEventListener('click', () => {
+  mob.classList.toggle('open');
+  tog.innerHTML = mob.classList.contains('open')
+    ? '<i class="bi bi-x-lg"></i>' : '<i class="bi bi-list"></i>';
+});
+
+// Navbar shadow
+window.addEventListener('scroll', () => {
+  document.querySelector('.nb').style.boxShadow =
+    window.scrollY > 8 ? '0 4px 32px rgba(0,0,0,.7)' : '0 2px 24px rgba(0,0,0,.5)';
+});
+
+// Notify toggle
+function toggleNotify(btn) {
+  const isActive = btn.classList.contains('active');
+  if (isActive) {
+    btn.classList.remove('active');
+    btn.innerHTML = '<i class="bi bi-bell"></i> <span>Bildir</span>';
+  } else {
+    btn.classList.add('active');
+    btn.innerHTML = '<i class="bi bi-bell-fill"></i> <span>Bildirim Açık</span>';
+  }
+}
+
+// Countdown timer — counts down to 18 April 2025 20:00
+function updateCountdown() {
+  const target = new Date('2025-04-18T20:00:00');
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) {
+    document.getElementById('cd-d').textContent = '00';
+    document.getElementById('cd-h').textContent = '00';
+    document.getElementById('cd-m').textContent = '00';
+    document.getElementById('cd-s').textContent = '00';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// Card animate in
+document.querySelectorAll('.fx-card').forEach((c, i) => {
+  c.style.opacity = '0';
+  c.style.transform = 'translateY(12px)';
+  setTimeout(() => {
+    c.style.transition = 'opacity .35s ease, transform .35s ease';
+    c.style.opacity = '1';
+    c.style.transform = 'translateY(0)';
+  }, 50 + i * 60);
+});
+</script>
+
+
+<script>
+// ── DATA ──
+const teams = [
+  { pos:1,  name:'Liverpool',       short:'LIV', logo:'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg',         mp:33, w:24, d:7,  l:2,  gf:74, ga:30, pts:79, form:['W','W','D','W','W'], zone:'champ' },
+  { pos:2,  name:'Arsenal',         short:'ARS', logo:'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg',           mp:33, w:22, d:6,  l:5,  gf:68, ga:26, pts:72, form:['D','W','W','L','W'], zone:'ucl' },
+  { pos:3,  name:'Manchester City', short:'MCI', logo:'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg', mp:33, w:20, d:7,  l:6,  gf:82, ga:44, pts:67, form:['W','W','W','D','W'], zone:'ucl' },
+  { pos:4,  name:'Chelsea',         short:'CHE', logo:'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg',           mp:33, w:18, d:8,  l:7,  gf:60, ga:42, pts:62, form:['L','W','D','W','W'], zone:'ucl' },
+  { pos:5,  name:'Newcastle',       short:'NEW', logo:'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg', mp:33, w:17, d:9,  l:7,  gf:58, ga:38, pts:60, form:['D','D','W','W','D'], zone:'uel' },
+  { pos:6,  name:'Aston Villa',     short:'AVL', logo:'https://upload.wikimedia.org/wikipedia/en/f/f9/Aston_Villa_FC_crest_%282016%29.svg', mp:33, w:17, d:7, l:9, gf:62, ga:48, pts:58, form:['W','L','W','W','W'], zone:'uel' },
+  { pos:7,  name:'Tottenham',       short:'TOT', logo:'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg',    mp:33, w:15, d:8,  l:10, gf:56, ga:50, pts:53, form:['D','D','L','W','D'], zone:'none' },
+  { pos:8,  name:'Manchester Utd',  short:'MNU', logo:'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg', mp:33, w:13, d:9, l:11, gf:40, ga:46, pts:48, form:['L','D','L','D','L'], zone:'none' },
+  { pos:9,  name:'West Ham',        short:'WHU', logo:'https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg', mp:33, w:12, d:10, l:11, gf:48, ga:52, pts:46, form:['L','W','D','W','L'], zone:'none' },
+  { pos:10, name:'Brighton',        short:'BHA', logo:'https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_FC_logo.svg', mp:33, w:12, d:9, l:12, gf:50, ga:54, pts:45, form:['W','D','W','L','D'], zone:'none' },
+  { pos:11, name:'Brentford',       short:'BRE', logo:'https://upload.wikimedia.org/wikipedia/en/2/2a/Brentford_FC_crest.svg',   mp:33, w:11, d:10, l:12, gf:46, ga:52, pts:43, form:['W','D','L','D','L'], zone:'none' },
+  { pos:12, name:'Fulham',          short:'FUL', logo:'https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg', mp:33, w:11, d:9, l:13, gf:44, ga:55, pts:42, form:['D','L','W','D','W'], zone:'none' },
+  { pos:13, name:'Wolves',          short:'WOL', logo:'https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg', mp:33, w:11, d:8, l:14, gf:46, ga:58, pts:41, form:['W','W','L','L','D'], zone:'none' },
+  { pos:14, name:'Everton',         short:'EVE', logo:'https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg',       mp:33, w:10, d:10, l:13, gf:38, ga:52, pts:40, form:['W','D','D','L','W'], zone:'none' },
+  { pos:15, name:'Crystal Palace',  short:'CRY', logo:'https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg', mp:33, w:9, d:9, l:15, gf:34, ga:50, pts:36, form:['L','D','L','W','D'], zone:'none' },
+  { pos:16, name:'Nottm Forest',    short:'NFO', logo:'https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_FC_logo.svg', mp:33, w:9, d:7, l:17, gf:38, ga:58, pts:34, form:['D','L','W','L','D'], zone:'none' },
+  { pos:17, name:'Bournemouth',     short:'BOU', logo:'https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg', mp:33, w:8, d:9, l:16, gf:42, ga:62, pts:33, form:['D','L','D','W','D'], zone:'none' },
+  { pos:18, name:'Leicester City',  short:'LEI', logo:'https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg',  mp:33, w:7, d:8,  l:18, gf:36, ga:68, pts:29, form:['W','L','L','D','L'], zone:'rel' },
+  { pos:19, name:'Ipswich Town',    short:'IPS', logo:'https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg',          mp:33, w:5, d:10, l:18, gf:28, ga:64, pts:25, form:['D','D','L','L','L'], zone:'rel' },
+  { pos:20, name:'Southampton',     short:'SOU', logo:'https://upload.wikimedia.org/wikipedia/en/c/c9/FC_Southampton.svg',        mp:33, w:3, d:7,  l:23, gf:24, ga:74, pts:16, form:['L','L','D','L','L'], zone:'rel' },
+];
+
+const zoneColors = {
+  champ:'cl-champ', ucl:'cl-ucl', uel:'cl-uel', uecl:'cl-uecl', rel:'cl-rel', none:'cl-none'
+};
+
+const formMap = { W:'fp-w', D:'fp-d', L:'fp-l' };
+const posColors = { champ:'top1', ucl:'top4', uel:'euro', rel:'rel', none:'' };
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  let html = '';
+
+  teams.forEach((t, i) => {
+    const gd = t.gf - t.ga;
+    const gdStr = gd > 0 ? '+' + gd : gd;
+    const gdClass = gd > 0 ? 'pos' : gd < 0 ? 'neg' : 'zero';
+    const posClass = posColors[t.zone] || '';
+    const zClass = zoneColors[t.zone] || 'cl-none';
+    const isPtsTop = t.zone === 'champ';
+
+    // zone separator labels
+    let sectionLabel = '';
+    if (i === 0) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">🏆 &nbsp;Şampiyonlar Ligi Grupları (1–4)</div></td></tr>`;
+    if (i === 4) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">🔵 &nbsp;UEFA Avrupa Ligi (5–6)</div></td></tr>`;
+    if (i === 6) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">— &nbsp;Avrupa Dışı (7–17)</div></td></tr>`;
+    if (i === 17) sectionLabel = `<tr><td colspan="12"><div class="zone-lbl">🔴 &nbsp;Küme Düşme Hattı (18–20)</div></td></tr>`;
+
+    const formPills = t.form.map(f =>
+      `<div class="fp ${formMap[f]}">${f}</div>`
+    ).join('');
+
+    html += sectionLabel;
+    html += `
+    <tr class="std-row" title="${t.name}">
+      <td style="padding:0;width:4px">
+        <div class="pos-strip ${zClass}" style="height:44px;border-radius:var(--r1) 0 0 var(--r1)"></div>
+      </td>
+      <td><span class="pos-num ${posClass}">${t.pos}</span></td>
+      <td>
+        <div class="team-cell">
+          <div class="t-logo">
+            <img src="${t.logo}" alt="${t.short}" onerror="this.parentNode.textContent='${t.short}'"/>
+          </div>
+          <div class="t-name">
+            <span class="t-full">${t.name}</span>
+            <span class="t-short">${t.short}</span>
+          </div>
+        </div>
+      </td>
+      <td class="s-mp">${t.mp}</td>
+      <td class="s-w">${t.w}</td>
+      <td class="s-d">${t.d}</td>
+      <td class="s-l">${t.l}</td>
+      <td class="s-gf hide-sm">${t.gf}</td>
+      <td class="s-ga hide-sm">${t.ga}</td>
+      <td class="s-gd ${gdClass}">${gdStr}</td>
+      <td><div class="form-row">${formPills}</div></td>
+      <td class="s-pts ${isPtsTop ? 'pts-top' : ''}">${t.pts}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+// Mobile nav
+const tog = document.getElementById('tog');
+const mob = document.getElementById('mobMenu');
+tog.addEventListener('click', () => {
+  mob.classList.toggle('open');
+  tog.innerHTML = mob.classList.contains('open')
+    ? '<i class="bi bi-x-lg"></i>' : '<i class="bi bi-list"></i>';
+});
+
+// Navbar shadow
+window.addEventListener('scroll', () => {
+  document.querySelector('.nb').style.boxShadow =
+    window.scrollY > 8 ? '0 4px 32px rgba(0,0,0,.7)' : '0 2px 24px rgba(0,0,0,.5)';
+});
+
+// Row animate in
+function animateRows() {
+  const rows = document.querySelectorAll('.std-row');
+  rows.forEach((r, i) => {
+    r.style.opacity = '0';
+    r.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+      r.style.transition = 'opacity .3s ease, transform .3s ease';
+      r.style.opacity = '1';
+      r.style.transform = 'translateY(0)';
+    }, 30 + i * 28);
+  });
+}
+
+renderTable();
+animateRows();
+</script>
+
+    <script>
+// Mobile nav
+const tog = document.getElementById('tog');
+const mob = document.getElementById('mobMenu');
+tog.addEventListener('click', () => {
+  mob.classList.toggle('open');
+  tog.innerHTML = mob.classList.contains('open')
+    ? '<i class="bi bi-x-lg"></i>' : '<i class="bi bi-list"></i>';
+});
+
+// Navbar shadow
+window.addEventListener('scroll', () => {
+  document.querySelector('.nb').style.boxShadow =
+    window.scrollY > 8 ? '0 4px 32px rgba(0,0,0,.7)' : '0 2px 24px rgba(0,0,0,.5)';
+});
+
+// Stat bar animation on scroll
+function animateBars() {
+  const bars = document.querySelectorAll('.bh .f, .ba .f');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.width = e.target.dataset.w;
+        obs.unobserve(e.target);
+      }
+    });
+  }, {threshold: 0.3});
+  bars.forEach(b => {
+    b.dataset.w = b.style.width;
+    b.style.width = '0';
+    obs.observe(b);
+  });
+}
+animateBars();
+</script>

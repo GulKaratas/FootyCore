@@ -1,5 +1,9 @@
-﻿using FootyCore.BusinessLayer.Abstract;
+﻿using AutoMapper;
+using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DataAccessLayer.Abstract;
+using FootyCore.DtoLayer.MatchDto;
 using FootyCore.EntityLayer.Entities;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,29 +14,49 @@ namespace FootyCore.BusinessLayer.Concrete
 {
     public class MatchManager : IMatchService
     {
-        public void TDelete(Match t)
+        private readonly IMatchDal _matchDal;
+        private readonly IMapper _mapper;
+
+        public MatchManager(IMatchDal matchDal,IMapper mapper)
         {
-            throw new NotImplementedException();
+            _matchDal = matchDal;
+            _mapper = mapper;
         }
 
-        public Match TGetById(int id)
+        public async Task<List<ResultMatchDto>> GetMatchesWithDetailsAsync()
         {
-            throw new NotImplementedException();
+            var value = await _matchDal.GetMatchesWithDetailsAsync();
+            return _mapper.Map<List<ResultMatchDto>>(value);
         }
 
-        public List<Match> TGetList()
+        public async Task TDelete(int id)
         {
-            throw new NotImplementedException();
+            await _matchDal.Delete(id);
         }
 
-        public void TInsert(Match t)
+        public async Task<GetMatchByIdDto> TGetById(int id)
         {
-            throw new NotImplementedException();
+            var value = await _matchDal.GetById(id);
+            return _mapper.Map<GetMatchByIdDto>(value);
+            
         }
 
-        public void TUpdate(Match t)
+        public async Task<List<ResultMatchDto>> TGetList()
         {
-            throw new NotImplementedException();
+            var value = await _matchDal.GetList();
+            return _mapper.Map<List<ResultMatchDto>>(value);
+        }
+
+        public async Task TInsert(CreateMatchDto dto)
+        {
+            var value = _mapper.Map<Match>(dto);
+            await _matchDal.Insert(value);
+        }
+
+        public async Task TUpdate(UpdateMatchDto dto)
+        {
+            var value = _mapper.Map<Match>(dto);
+            await _matchDal.Update(value);
         }
     }
 }

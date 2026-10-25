@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FootyCore.WebUI.Controllers
 {
@@ -18,14 +18,7 @@ namespace FootyCore.WebUI.Controllers
         {
             return PartialView();
         }
-        public PartialViewResult TopbarPartial()
-        {
-            return PartialView();
-        }
-        public PartialViewResult FilterPartial()
-        {
-            return PartialView();
-        }
+
         public PartialViewResult FooterPartial()
         {
             return PartialView();

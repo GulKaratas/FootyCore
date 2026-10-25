@@ -9,5 +9,7 @@ namespace FootyCore.DataAccessLayer.Abstract
 {
     public interface IMatchDal : IGenericDal<Match>
     {
+        Task<List<Match>> GetMatchesWithDetailsAsync();
+
     }
 }

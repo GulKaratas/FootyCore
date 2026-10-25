@@ -1,13 +1,10 @@
-﻿using FootyCore.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FootyCore.DtoLayer.MatchDto;
 
 namespace FootyCore.BusinessLayer.Abstract
 {
-    public interface IMatchService : IGenericService<Match>
+    public interface IMatchService : IGenericService<ResultMatchDto, CreateMatchDto, UpdateMatchDto, GetMatchByIdDto>
     {
+        Task<List<ResultMatchDto>> GetMatchesWithDetailsAsync();
+
     }
 }
