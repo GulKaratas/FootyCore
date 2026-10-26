@@ -4,7 +4,7 @@ namespace FootyCore.EntityLayer.Entities
     public class Match
     {
         public int MatchId { get; set; }
-
+        public int Week { get; set; }
         public int SeasonId { get; set; }
         public Season Season { get; set; }
         public int HomeTeamId { get; set; }

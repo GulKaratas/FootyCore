@@ -79,6 +79,9 @@ namespace FootyCore.DataAccessLayer.Migrations
                     b.Property<int>("StadiumId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Week")
+                        .HasColumnType("int");
+
                     b.HasKey("MatchId");
 
                     b.HasIndex("AwayTeamId");
@@ -116,9 +119,14 @@ namespace FootyCore.DataAccessLayer.Migrations
                     b.Property<int>("Minute")
                         .HasColumnType("int");
 
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
                     b.HasKey("MatchDetailId");
 
                     b.HasIndex("MatchId");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("MatchDetails");
                 });
@@ -328,7 +336,15 @@ namespace FootyCore.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FootyCore.EntityLayer.Entities.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Match");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("FootyCore.EntityLayer.Entities.MatchStatistic", b =>

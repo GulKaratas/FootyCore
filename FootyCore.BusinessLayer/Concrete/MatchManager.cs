@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FootyCore.BusinessLayer.Abstract;
 using FootyCore.DataAccessLayer.Abstract;
 using FootyCore.DtoLayer.MatchDto;
+using FootyCore.DtoLayer.MatchStatisticDto;
 using FootyCore.EntityLayer.Entities;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
@@ -21,6 +22,25 @@ namespace FootyCore.BusinessLayer.Concrete
         {
             _matchDal = matchDal;
             _mapper = mapper;
+        }
+
+        public async Task<ResultMatchDto?> GetMatchDetailsByIdAsync(int matchId)
+        {
+            var match = await _matchDal.GetMatchDetailsByIdAsync(matchId);
+            if (match == null)
+                return null;
+
+            var dto = _mapper.Map<ResultMatchDto>(match);
+            dto.Statistic = match.MatchStatistic == null
+                ? null
+                : _mapper.Map<ResultMatchStatisticDto>(match.MatchStatistic);
+            return dto;
+        }
+
+        public async Task<List<ResultMatchDto>> GetMatchesBySeasonAndWeekAsync(int seasonId, int week)
+        {
+            var value = await _matchDal.GetMatchesBySeasonAndWeekAsync(seasonId, week);
+            return _mapper.Map<List<ResultMatchDto>>(value);
         }
 
         public async Task<List<ResultMatchDto>> GetMatchesWithDetailsAsync()

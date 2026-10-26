@@ -254,3 +254,89 @@ function animateBars() {
 }
 animateBars();
 </script>
+<script id="standings-data" type="application/json">[]</script>
+<script>
+const teams = JSON.parse(document.getElementById('standings-data').textContent);
+
+const zoneColors = {
+    champ: 'cl-champ', ucl: 'cl-ucl', uel: 'cl-uel', uecl: 'cl-uecl', rel: 'cl-rel', none: 'cl-none'
+};
+const formMap = { W: 'fp-w', D: 'fp-d', L: 'fp-l' };
+const posColors = { champ: 'top1', ucl: 'top4', uel: 'euro', rel: 'rel', none: '' };
+const zoneGroup = { champ: 'ucl', ucl: 'ucl', uel: 'uel', uecl: 'uecl', rel: 'rel', none: 'none' };
+const zoneLabels = {
+    ucl: '🏆 &nbsp;Şampiyonlar Ligi',
+    uel: '🔵 &nbsp;UEFA Avrupa Ligi',
+    uecl: 'UEFA Konferans Ligi',
+    none: '— &nbsp;Avrupa Dışı',
+    rel: '🔴 &nbsp;Küme Düşme Hattı'
+};
+
+function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+
+    let html = '';
+    let lastGroup = null;
+
+    teams.forEach(t => {
+        const group = zoneGroup[t.zone] || 'none';
+        if (group !== lastGroup) {
+            html += `<tr><td colspan="12"><div class="zone-lbl">${zoneLabels[group] || ''}</div></td></tr>`;
+            lastGroup = group;
+        }
+
+        const gd = t.gf - t.ga;
+        const gdStr = gd > 0 ? '+' + gd : gd;
+        const gdClass = gd > 0 ? 'pos' : gd < 0 ? 'neg' : 'zero';
+        const posClass = posColors[t.zone] || '';
+        const zClass = zoneColors[t.zone] || 'cl-none';
+        const formPills = (t.form || []).map(f => `<div class="fp ${formMap[f]}">${f}</div>`).join('');
+
+        html += `
+        <tr class="std-row" title="${t.name}">
+            <td style="padding:0;width:4px">
+                <div class="pos-strip ${zClass}" style="height:44px;border-radius:var(--r1) 0 0 var(--r1)"></div>
+            </td>
+            <td><span class="pos-num ${posClass}">${t.pos}</span></td>
+            <td>
+                <div class="team-cell">
+                    <div class="t-logo">
+                        <img src="${t.logo}" alt="${t.short}" onerror="this.parentNode.textContent='${t.short}'"/>
+                    </div>
+                    <div class="t-name">
+                        <span class="t-full">${t.name}</span>
+                        <span class="t-short">${t.short}</span>
+                    </div>
+                </div>
+            </td>
+            <td class="s-mp">${t.mp}</td>
+            <td class="s-w">${t.w}</td>
+            <td class="s-d">${t.d}</td>
+            <td class="s-l">${t.l}</td>
+            <td class="s-gf hide-sm">${t.gf}</td>
+            <td class="s-ga hide-sm">${t.ga}</td>
+            <td class="s-gd ${gdClass}">${gdStr}</td>
+            <td><div class="form-row">${formPills}</div></td>
+            <td class="s-pts ${t.zone === 'champ' ? 'pts-top' : ''}">${t.pts}</td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+}
+
+function animateRows() {
+    document.querySelectorAll('.std-row').forEach((row, i) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            row.style.transition = 'opacity .3s ease, transform .3s ease';
+            row.style.opacity = '1';
+            row.style.transform = 'translateY(0)';
+        }, 30 + i * 28);
+    });
+}
+
+renderTable();
+animateRows();
+</script>

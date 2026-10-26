@@ -49,6 +49,12 @@ namespace FootyCore.DataAccessLayer.Concrete
                 .WithOne(s => s.Match)
                 .HasForeignKey<MatchStatistic>(s => s.MatchId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MatchDetail>()
+                .HasOne(d => d.Team)
+                .WithMany()
+                .HasForeignKey(d => d.TeamId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

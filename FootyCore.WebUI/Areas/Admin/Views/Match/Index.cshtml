@@ -1,0 +1,203 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Admin/_IndexLayout.cshtml";
+}
+
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <header class="top-bar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="menu-toggle-btn" id="menuToggle" aria-label="Menüyü Aç/Kapa">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="top-bar-title">
+          <h2 class="">Maç Sonucu</h2>
+          <p class="">Oynanmış maçın skorunu gir.</p>
+        </div>
+      </div>
+      <div>
+        <div class="admin-pill">
+          <span class="status-dot"></span>
+          <span class="">Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-container">
+      <!-- Skor Giriş Formu -->
+      <div class="fc-card">
+        <div class="fc-card-title">
+          <i class="bi bi-pencil-square" style="color: var(--primary-coral);"></i>
+          <span class="">Skor Girişi</span>
+        </div>
+
+        <form id="scoreForm">
+          <!-- Maç Seçimi -->
+          <div class="mb-4">
+            <label class="form-label" for="matchSelect">Maç Seçimi</label>
+            <select class="form-select" id="matchSelect" required="">
+              <option value="1" data-home="Galatasaray" data-away="Fenerbahçe" selected="">Hafta 26: Galatasaray vs Fenerbahçe (29.03.2025)</option>
+              <option value="2" data-home="Arsenal" data-away="Liverpool">Hafta 25: Arsenal vs Liverpool (23.03.2025)</option>
+              <option value="3" data-home="Beşiktaş" data-away="Trabzonspor">Hafta 25: Beşiktaş vs Trabzonspor (22.03.2025)</option>
+              <option value="4" data-home="Manchester City" data-away="Chelsea">Hafta 24: Manchester City vs Chelsea (15.03.2025)</option>
+            </select>
+          </div>
+
+          <!-- Büyük Skor Kartı -->
+          <div class="score-board-card">
+            <div class="row align-items-center g-3">
+              <!-- Ev Sahibi -->
+              <div class="col-12 col-md-4 text-center text-md-end">
+                <div class="score-team-role">Ev Sahibi</div>
+                <div class="score-team-name" id="homeTeamLabel">Galatasaray</div>
+              </div>
+
+              <!-- Skor Kutuları -->
+              <div class="col-12 col-md-4 d-flex justify-content-center align-items-center">
+                <input type="number" class="score-input-box" id="homeScore" min="0" max="25" value="2" required="" aria-label="Ev Sahibi Gol">
+                <span class="score-separator">-</span>
+                <input type="number" class="score-input-box" id="awayScore" min="0" max="25" value="1" required="" aria-label="Deplasman Gol">
+              </div>
+
+              <!-- Deplasman -->
+              <div class="col-12 col-md-4 text-center text-md-start">
+                <div class="score-team-role">Deplasman</div>
+                <div class="score-team-name" id="awayTeamLabel">Fenerbahçe</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Durum Seçimi & Kaydet Butonu -->
+          <div class="row g-3 align-items-end mt-2">
+            <div class="col-md-6">
+              <label class="form-label" for="matchStatus">Maç Durumu</label>
+              <select class="form-select" id="matchStatus" required="">
+                <option value="Bitti" selected="">Bitti</option>
+                <option value="Canlı">Canlı</option>
+                <option value="Yaklaşan">Yaklaşan</option>
+                <option value="Oynanmadı">Oynanmadı</option>
+              </select>
+            </div>
+            <div class="col-md-6 d-flex justify-content-md-end">
+              <button type="submit" class="btn-coral w-100 w-md-auto">
+                <i class="bi bi-save2"></i> Skoru Kaydet
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Son Girilen Üç Skor Tablosu -->
+      <div class="fc-card p-0 overflow-hidden">
+        <div class="p-4 pb-3">
+          <div class="fc-card-title mb-0">
+            <i class="bi bi-clock-history" style="color: var(--secondary-teal);"></i>
+            <span class="">Son Girilen Skorlar</span>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table fc-table align-middle">
+            <thead>
+              <tr><th class="">Maç</th>
+                <th class="">Skor</th>
+                <th class="">Durum</th>
+                <th class="text-md-end">İşlemler</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="">
+                  <span class="fw-semibold">Beşiktaş</span> 
+                  <span class="text-muted mx-1">vs</span> 
+                  <span class="fw-semibold">Trabzonspor</span>
+                  <div class="text-muted" style="font-size: 0.78rem;">Hafta 25 • 22 Mart 2025</div>
+                </td>
+                <td class="">
+                  <span class="score-coral-text">2 - 1</span>
+                </td>
+                <td class="">
+                  <span class="badge-status badge-green">
+                    <i class="bi bi-check-circle-fill" style="font-size:8px;"></i> Bitti
+                  </span>
+                </td>
+              <td class="text-md-end"><div class="d-flex justify-content-md-end gap-2"><button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1" title="Düzenle" style="font-size: 0.8rem; border-radius: 8px; border-color: var(--border-color);"><i class="bi bi-pencil"></i></button><button type="button" class="btn btn-sm text-danger d-inline-flex align-items-center gap-1" title="Sil" style="font-size: 0.8rem; border-radius: 8px; background: rgba(226, 59, 74, 0.08);"><i class="bi bi-trash3"></i></button></div></td></tr>
+              <tr>
+                <td class="">
+                  <span class="fw-semibold">Arsenal</span> 
+                  <span class="text-muted mx-1">vs</span> 
+                  <span class="fw-semibold">Liverpool</span>
+                  <div class="text-muted" style="font-size: 0.78rem;">Hafta 25 • 23 Mart 2025</div>
+                </td>
+                <td class="">
+                  <span class="score-coral-text">2 - 2</span>
+                </td>
+                <td class="">
+                  <span class="badge-status badge-green">
+                    <i class="bi bi-check-circle-fill" style="font-size:8px;"></i> Bitti
+                  </span>
+                </td>
+              <td class="text-md-end"><div class="d-flex justify-content-md-end gap-2"><button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1" title="Düzenle" style="font-size: 0.8rem; border-radius: 8px; border-color: var(--border-color);"><i class="bi bi-pencil"></i></button><button type="button" class="btn btn-sm text-danger d-inline-flex align-items-center gap-1" title="Sil" style="font-size: 0.8rem; border-radius: 8px; background: rgba(226, 59, 74, 0.08);"><i class="bi bi-trash3"></i></button></div></td></tr>
+              <tr>
+                <td class="">
+                  <span class="fw-semibold">Manchester City</span> 
+                  <span class="text-muted mx-1">vs</span> 
+                  <span class="fw-semibold">Chelsea</span>
+                  <div class="text-muted" style="font-size: 0.78rem;">Hafta 24 • 15 Mart 2025</div>
+                </td>
+                <td class="">
+                  <span class="score-coral-text">3 - 0</span>
+                </td>
+                <td class="">
+                  <span class="badge-status badge-green">
+                    <i class="bi bi-check-circle-fill" style="font-size:8px;"></i> Bitti
+                  </span>
+                </td>
+              <td class="text-md-end"><div class="d-flex justify-content-md-end gap-2"><button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1" title="Düzenle" style="font-size: 0.8rem; border-radius: 8px; border-color: var(--border-color);"><i class="bi bi-pencil"></i></button><button type="button" class="btn btn-sm text-danger d-inline-flex align-items-center gap-1" title="Sil" style="font-size: 0.8rem; border-radius: 8px; background: rgba(226, 59, 74, 0.08);"><i class="bi bi-trash3"></i></button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mobile sidebar toggle
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    sidebarBackdrop.classList.toggle('active');
+  });
+
+  sidebarBackdrop.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    sidebarBackdrop.classList.remove('active');
+  });
+
+  // Dinamik Takım Güncelleme
+  const matchSelect = document.getElementById('matchSelect');
+  const homeTeamLabel = document.getElementById('homeTeamLabel');
+  const awayTeamLabel = document.getElementById('awayTeamLabel');
+
+  matchSelect.addEventListener('change', () => {
+    const selectedOption = matchSelect.options[matchSelect.selectedIndex];
+    homeTeamLabel.textContent = selectedOption.getAttribute('data-home');
+    awayTeamLabel.textContent = selectedOption.getAttribute('data-away');
+  });
+
+  // Skor kaydetme ve toast gösterimi
+  const scoreForm = document.getElementById('scoreForm');
+  const successToast = document.getElementById('successToast');
+
+  scoreForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    successToast.style.display = 'block';
+    setTimeout(() => {
+      successToast.style.display = 'none';
+    }, 3200);
+  });
+</script>

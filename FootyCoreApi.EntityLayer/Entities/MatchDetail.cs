@@ -12,7 +12,8 @@ namespace FootyCore.EntityLayer.Entities
 
         public int MatchId { get; set; }
         public Match Match { get; set; }
-
+        public int TeamId { get; set; }
+        public Team Team { get; set; }
         public string ActionType { get; set; }
 
         public string Description { get; set; }

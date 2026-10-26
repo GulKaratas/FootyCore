@@ -1,0 +1,35 @@
+﻿
+@{
+        Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+@await Html.PartialAsync("~/Areas/Admin/Views/Admin/HeadPartial.cshtml")
+<body>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="app-wrapper">
+  <!-- Sidebar -->
+        @await Html.PartialAsync("~/Areas/Admin/Views/Admin/SidebarPartial.cshtml")
+
+  <!-- Main Content Area -->
+   @RenderBody()
+  
+</div>
+
+<!-- Başarı Bildirimi Toast -->
+<div class="toast-alert" id="successToast">
+  <div class="d-flex align-items-center gap-2">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 1.3rem;"></i>
+    <div>
+      <div class="fw-bold" style="font-size: 0.9rem; color: var(--text-main);">Başarıyla Kaydedildi</div>
+      <div class="text-muted" style="font-size: 0.8rem;">Yeni maç fikstüre eklendi.</div>
+    </div>
+  </div>
+</div>
+
+    @await Html.PartialAsync("~/Areas/Admin/Views/Admin/ScriptPartial.cshtml")
+
+</body>
+</html>

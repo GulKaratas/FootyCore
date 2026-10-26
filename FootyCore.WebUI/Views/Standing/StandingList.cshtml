@@ -1,115 +1,109 @@
+
+@model StandingPageViewModel
 @{
     ViewData["Title"] = "StandingList";
     Layout = "~/Views/Default/_IndexLayout.cshtml";
-}
 
-<div class="wrap">
-    <div class="tbl-wrap">
-        <table class="std-table">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>#</th>
-                    <th class="team-col">Takım</th>
-                    <th>O</th>
-                    <th>G</th>
-                    <th>B</th>
-                    <th>M</th>
-                    <th class="hide-sm">A</th>
-                    <th class="hide-sm">Y</th>
-                    <th>Av</th>
-                    <th>Form</th>
-                    <th>P</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+    var rows = Model.Standings ?? new List<ResultStandingDto>();
+    var leader = rows.FirstOrDefault();
+    var mostGoals = rows.OrderByDescending(x => x.GoalsFor).FirstOrDefault();
+    var leastConceded = rows.Where(x => x.Played > 0).OrderBy(x => x.GoalsAgainst).FirstOrDefault();
+}
+<!-- PAGE HEADER -->
+<section class="pg-head">
+  <div class="wrap">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <div class="pg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
+        <h1 class="pg-title">Puan <span style="color:var(--green)">Durumu</span></h1>
+                <p class="pg-sub">@Model.SeasonName &nbsp;·&nbsp; @Model.Week. Hafta Sonrası</p>
+      </div>
+      <div class="col-lg-4 mt-3 mt-lg-0">
+        <div class="legend">
+          <div class="leg-item"><div class="leg-dot" style="background:rgba(255,214,0,.8)"></div>Şampiyon</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Şampiyonlar Ligi</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>UEFA Ligi</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--live)"></div>Küme Düşme</div>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main>
+<div class="wrap">
+<div class="tbl-wrap">
+
+  <!-- TOP STAT CARDS -->
+  <div class="top-stats">
+    <div class="ts-card">
+      <div class="ts-label">Lider Takım</div>
+                    <div class="ts-val" style="color:var(--gold)">@(leader?.ShortName)</div>
+                    <div class="ts-team">@(leader?.TeamName) · @(leader?.Points ?? 0) puan</div>
+    </div>
+    <div class="ts-card">
+      <div class="ts-label">En Çok Gol</div>
+                    <div class="ts-val" style="color:var(--green)">@(mostGoals?.GoalsFor ?? 0)</div>
+                    <div class="ts-team">@(mostGoals?.TeamName)</div>
+    </div>
+    <div class="ts-card">
+      <div class="ts-label">En Az Yenilen</div>
+                    <div class="ts-val" style="color:var(--blue)">@(leastConceded?.GoalsAgainst ?? 0)</div>
+                    <div class="ts-team">@(leastConceded?.TeamName)</div>
+    </div>
+    <div class="ts-card">
+      <div class="ts-label">Haftanın Maçı</div>
+                    <div class="ts-val" style="color:var(--t1);font-size:16px;margin-top:2px">@Model.FeaturedText</div>
+                    <div class="ts-team">@Model.FeaturedStadium</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div style="overflow-x:auto;border-radius:var(--r3);border:1px solid var(--border)">
+  <table class="std-table" style="min-width:620px">
+    <thead>
+      <tr>
+                            <tbody>
+                                @foreach (var row in rows)
+                                {
+                                    var gd = row.GoalDifference;
+                                    var gdText = gd > 0 ? "+" + gd : gd.ToString();
+                                    var gdClass = gd > 0 ? "pos" : gd < 0 ? "neg" : "zero";
+                                    var strip = row.Zone == "champ" ? "cl-champ" : row.Zone == "ucl" ? "cl-ucl" : row.Zone == "uel" ? "cl-uel" : row.Zone == "rel" ? "cl-rel" : "cl-none";
+                                    var posClass = row.Zone == "champ" ? "top1" : row.Zone == "ucl" ? "top4" : row.Zone == "uel" ? "euro" : row.Zone == "rel" ? "rel" : "";
+
+                                    <tr class="std-row">
+                                        <td style="padding:0;width:4px"><div class="pos-strip @strip" style="height:44px"></div></td>
+                                        <td><span class="pos-num @posClass">@row.Position</span></td>
+                                        <td>
+                                            <div class="team-cell">
+                                                <div class="t-logo"><img src="@row.LogoUrl" alt="@row.ShortName" /></div>
+                                                <div class="t-name">
+                                                    <span class="t-full">@row.TeamName</span>
+                                                    <span class="t-short">@row.ShortName</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@row.Played</td>
+                                        <td>@row.Won</td>
+                                        <td>@row.Drawn</td>
+                                        <td>@row.Lost</td>
+                                        <td class="hide-sm">@row.GoalsFor</td>
+                                        <td class="hide-sm">@row.GoalsAgainst</td>
+                                        <td class="@gdClass">@gdText</td>
+                                        <td class="@(row.Zone == "champ" ? "pts-top" : "")">@row.Points</td>
+                                    </tr>
+                                }
+                            </tbody>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  </div>
+
 </div>
+</div>
+</main>
 
-<script id="standings-data" type="application/json">[]</script>
-<script>
-const teams = JSON.parse(document.getElementById('standings-data').textContent);
 
-const zoneColors = {
-    champ: 'cl-champ', ucl: 'cl-ucl', uel: 'cl-uel', uecl: 'cl-uecl', rel: 'cl-rel', none: 'cl-none'
-};
-const formMap = { W: 'fp-w', D: 'fp-d', L: 'fp-l' };
-const posColors = { champ: 'top1', ucl: 'top4', uel: 'euro', rel: 'rel', none: '' };
-const zoneGroup = { champ: 'ucl', ucl: 'ucl', uel: 'uel', uecl: 'uecl', rel: 'rel', none: 'none' };
-const zoneLabels = {
-    ucl: '🏆 &nbsp;Şampiyonlar Ligi',
-    uel: '🔵 &nbsp;UEFA Avrupa Ligi',
-    uecl: 'UEFA Konferans Ligi',
-    none: '— &nbsp;Avrupa Dışı',
-    rel: '🔴 &nbsp;Küme Düşme Hattı'
-};
-
-function renderTable() {
-    const tbody = document.getElementById('tableBody');
-    if (!tbody) return;
-
-    let html = '';
-    let lastGroup = null;
-
-    teams.forEach(t => {
-        const group = zoneGroup[t.zone] || 'none';
-        if (group !== lastGroup) {
-            html += `<tr><td colspan="12"><div class="zone-lbl">${zoneLabels[group] || ''}</div></td></tr>`;
-            lastGroup = group;
-        }
-
-        const gd = t.gf - t.ga;
-        const gdStr = gd > 0 ? '+' + gd : gd;
-        const gdClass = gd > 0 ? 'pos' : gd < 0 ? 'neg' : 'zero';
-        const posClass = posColors[t.zone] || '';
-        const zClass = zoneColors[t.zone] || 'cl-none';
-        const formPills = (t.form || []).map(f => `<div class="fp ${formMap[f]}">${f}</div>`).join('');
-
-        html += `
-        <tr class="std-row" title="${t.name}">
-            <td style="padding:0;width:4px">
-                <div class="pos-strip ${zClass}" style="height:44px;border-radius:var(--r1) 0 0 var(--r1)"></div>
-            </td>
-            <td><span class="pos-num ${posClass}">${t.pos}</span></td>
-            <td>
-                <div class="team-cell">
-                    <div class="t-logo">
-                        <img src="${t.logo}" alt="${t.short}" onerror="this.parentNode.textContent='${t.short}'"/>
-                    </div>
-                    <div class="t-name">
-                        <span class="t-full">${t.name}</span>
-                        <span class="t-short">${t.short}</span>
-                    </div>
-                </div>
-            </td>
-            <td class="s-mp">${t.mp}</td>
-            <td class="s-w">${t.w}</td>
-            <td class="s-d">${t.d}</td>
-            <td class="s-l">${t.l}</td>
-            <td class="s-gf hide-sm">${t.gf}</td>
-            <td class="s-ga hide-sm">${t.ga}</td>
-            <td class="s-gd ${gdClass}">${gdStr}</td>
-            <td><div class="form-row">${formPills}</div></td>
-            <td class="s-pts ${t.zone === 'champ' ? 'pts-top' : ''}">${t.pts}</td>
-        </tr>`;
-    });
-
-    tbody.innerHTML = html;
-}
-
-function animateRows() {
-    document.querySelectorAll('.std-row').forEach((row, i) => {
-        row.style.opacity = '0';
-        row.style.transform = 'translateY(10px)';
-        setTimeout(() => {
-            row.style.transition = 'opacity .3s ease, transform .3s ease';
-            row.style.opacity = '1';
-            row.style.transform = 'translateY(0)';
-        }, 30 + i * 28);
-    });
-}
-
-renderTable();
-animateRows();
-</script>

@@ -1,287 +1,159 @@
-@model List<ResultMatchDto>
+@model MatchPageViewModel
 @{
     ViewData["Title"] = "MatchList";
     Layout = "~/Views/Default/_IndexLayout.cshtml";
 
+    var matches = Model.Matches ?? new List<ResultMatchDto>();
+    var liveMatches = matches.Where(x => x.StatusName != null && x.StatusName.Contains("Canlı")).ToList();
+    var finishedMatches = matches.Where(x => x.StatusName != null && x.StatusName.Contains("Bitti")).ToList();
+    var upcomingMatches = matches.Where(x => x.StatusName != null && x.StatusName.Contains("Oynanmadı")).ToList();
+    var featured = Model.FeaturedMatch ?? matches.FirstOrDefault();
 }
-<!-- LEAGUE HEADER -->
+
 <section class="lg-head">
   <div class="wrap">
     <div class="row align-items-center">
       <div class="col-lg-7">
-        <div class="lg-badge"><i class="bi bi-trophy-fill"></i> Premier League</div>
-        <h1 class="lg-title">Hafta <span style="color:var(--green)">33</span> Sonuçları</h1>
-        <p class="lg-sub">11 Nisan – 13 Nisan 2025 &nbsp;·&nbsp; 10 Maç</p>
+        <div class="lg-badge"><i class="bi bi-trophy-fill"></i> @Model.LeagueName</div>
+        <h1 class="lg-title">Hafta <span style="color:var(--green)">@Model.SelectedWeek</span> Sonuçları</h1>
+        <p class="lg-sub">@Model.DateRange &nbsp;·&nbsp; @matches.Count Maç</p>
       </div>
       <div class="col-lg-5 d-none d-lg-block">
         <div class="lg-stats">
-          <div style="text-align:center"><div class="ls-num">3</div><div class="ls-lbl">Canlı</div></div>
-          <div style="text-align:center"><div class="ls-num">5</div><div class="ls-lbl">Biten</div></div>
-          <div style="text-align:center"><div class="ls-num">2</div><div class="ls-lbl">Yaklaşan</div></div>
+          <div style="text-align:center"><div class="ls-num">@liveMatches.Count</div><div class="ls-lbl">Canlı</div></div>
+          <div style="text-align:center"><div class="ls-num">@finishedMatches.Count</div><div class="ls-lbl">Biten</div></div>
+          <div style="text-align:center"><div class="ls-num">@upcomingMatches.Count</div><div class="ls-lbl">Yaklaşan</div></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FILTER TABS -->
 <div class="ftabs-wrap">
   <div class="wrap">
     <div class="ftabs">
       <button class="ftab active" data-f="all">Tüm Maçlar</button>
-      <button class="ftab" data-f="live"><span class="live-dot"></span>Canlı<span class="bcnt">3</span></button>
+      <button class="ftab" data-f="live"><span class="live-dot"></span>Canlı<span class="bcnt">@liveMatches.Count</span></button>
       <button class="ftab" data-f="finished">Tamamlananlar</button>
       <button class="ftab" data-f="upcoming">Yaklaşanlar</button>
     </div>
   </div>
 </div>
 
-<!-- MAIN -->
 <main>
 <div class="wrap" style="padding-top:28px;padding-bottom:56px">
 
-  <!-- FEATURED -->
   <div class="feat-wrap" id="featWrap">
-    <div class="feat-lbl">Öne Çıkan Maç</div>
-    <a href="match-detail.html" class="feat-card">
-      <div class="row align-items-center g-2">
-        <div class="col-5">
-          <div class="ft-team">
-            <div class="ft-logo" style="border-color:rgba(239,1,7,.4)">
-              <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="ARS" onerror="this.parentNode.textContent='ARS'"/>
+    @if (featured != null)
+    {
+      <div class="feat-lbl">Öne Çıkan Maç</div>
+      <a asp-controller="Match" asp-action="MatchDetails" asp-route-id="@featured.MatchId" class="feat-card">
+        <div class="row align-items-center g-2">
+          <div class="col-5">
+            <div class="ft-team">
+              <div class="ft-logo" style="border-color:rgba(239,1,7,.4)">
+                <img src="@featured.HomeLogoUrl" alt="@featured.HomeTeamName" onerror="this.parentNode.textContent='EV'" />
+              </div>
+              <div class="ft-name">@featured.HomeTeamName</div>
+              <div class="ft-type">Ev Sahibi</div>
             </div>
-            <div class="ft-name">Arsenal</div>
-            <div class="ft-type">Ev Sahibi</div>
           </div>
-        </div>
-        <div class="col-2 text-center">
-          <div class="ft-sc-area">
-            <div class="ft-sc">2–2</div>
-            <div class="ft-stat"><i class="bi bi-check2-circle"></i> MAÇ BİTTİ</div>
-            <div class="ft-meta">İY: 1–1 &nbsp;·&nbsp; 16:30</div>
-          </div>
-        </div>
-        <div class="col-5">
-          <div class="ft-team">
-            <div class="ft-logo" style="border-color:rgba(200,16,46,.4)">
-              <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="LIV" onerror="this.parentNode.textContent='LIV'"/>
+          <div class="col-2 text-center">
+            <div class="ft-sc-area">
+              <div class="ft-sc">@featured.HomeScore – @featured.AwayScore</div>
+              <div class="ft-stat"><i class="bi bi-check2-circle"></i> @featured.StatusName</div>
+              <div class="ft-meta">@featured.MatchDate.ToString("HH:mm")</div>
             </div>
-            <div class="ft-name">Liverpool</div>
-            <div class="ft-type">Deplasman</div>
+          </div>
+          <div class="col-5">
+            <div class="ft-team">
+              <div class="ft-logo" style="border-color:rgba(200,16,46,.4)">
+                <img src="@featured.AwayLogoUrl" alt="@featured.AwayTeamName" onerror="this.parentNode.textContent='DEP'" />
+              </div>
+              <div class="ft-name">@featured.AwayTeamName</div>
+              <div class="ft-type">Deplasman</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="text-center mt-3" style="font-size:12px;color:var(--t2)">
-        <i class="bi bi-geo-alt"></i> Emirates Stadium &nbsp;·&nbsp;
-        <i class="bi bi-calendar3"></i> 12 Nisan 2025 &nbsp;·&nbsp;
-        <span style="color:var(--blue)">Detayları Gör →</span>
-      </div>
-    </a>
+        <div class="text-center mt-3" style="font-size:12px;color:var(--t2)">
+          <i class="bi bi-geo-alt"></i> @featured.StadiumName &nbsp;·&nbsp;
+          <i class="bi bi-calendar3"></i> @featured.MatchDate.ToString("dd MMMM yyyy") &nbsp;·&nbsp;
+          <span style="color:var(--blue)">Detayları Gör →</span>
+        </div>
+      </a>
+    }
   </div>
 
-  <!-- ════ LIVE ════ -->
   <div class="sec-ttl mcw-section" data-s="live">🔴 &nbsp;Canlı Maçlar</div>
-
-  <div class="mc-wrap mcw" data-s="live">
-    <div class="mc live lp">
-      <div class="mc-time">
-        <div class="mc-min lc">67'</div>
-        <div class="sbadge sb-live"><span class="live-dot"></span>CANLI</div>
-      </div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg" alt="TOT" onerror="this.parentNode.textContent='TOT'"/></div>
-          <span class="tn">Tottenham</span>
-          <span class="ts">1</span>
+  @foreach (var item in liveMatches)
+  {
+    <div class="mc-wrap mcw" data-s="live">
+      <div class="mc live lp">
+        <div class="mc-time">
+          <div class="mc-min lc">@item.MatchDate.ToString("HH:mm")</div>
+          <div class="sbadge sb-live"><span class="live-dot"></span>@item.StatusName</div>
         </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg" alt="NEW" onerror="this.parentNode.textContent='NEW'"/></div>
-          <span class="tn">Newcastle</span>
-          <span class="ts">1</span>
+        <div class="dvv"></div>
+        <div class="mc-teams">
+          <div class="mc-tr">
+            <div class="tl-sm"><img src="@item.HomeLogoUrl" alt="@item.HomeTeamName" onerror="this.parentNode.textContent='EV'"/></div>
+            <span class="tn">@item.HomeTeamName</span>
+            <span class="ts">@item.HomeScore</span>
+          </div>
+          <div class="mc-tr">
+            <div class="tl-sm"><img src="@item.AwayLogoUrl" alt="@item.AwayTeamName" onerror="this.parentNode.textContent='DEP'"/></div>
+            <span class="tn">@item.AwayTeamName</span>
+            <span class="ts">@item.AwayScore</span>
+          </div>
         </div>
+        <a asp-controller="Match" asp-action="MatchDetails" asp-route-id="@item.MatchId" class="det-btn"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
       </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
     </div>
-  </div>
+  }
 
-  <div class="mc-wrap mcw" data-s="live">
-    <div class="mc live lp">
-      <div class="mc-time">
-        <div class="mc-min yc">HT</div>
-        <div class="sbadge sb-ht">İLK YARI</div>
-      </div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" alt="MNU" onerror="this.parentNode.textContent='MNU'"/></div>
-          <span class="tn">Manchester Utd</span>
-          <span class="ts">0</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/f/f9/Aston_Villa_FC_crest_%282016%29.svg" alt="AVL" onerror="this.parentNode.textContent='AVL'"/></div>
-          <span class="tn">Aston Villa</span>
-          <span class="ts win">2</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
-    </div>
-  </div>
-
-  <div class="mc-wrap mcw" data-s="live">
-    <div class="mc live lp">
-      <div class="mc-time">
-        <div class="mc-min lc">82'</div>
-        <div class="sbadge sb-live"><span class="live-dot"></span>CANLI</div>
-      </div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg" alt="BOU" onerror="this.parentNode.textContent='BOU'"/></div>
-          <span class="tn">Bournemouth</span>
-          <span class="ts">2</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_FC_logo.svg" alt="NFO" onerror="this.parentNode.textContent='NFO'"/></div>
-          <span class="tn">Nottm Forest</span>
-          <span class="ts">2</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
-    </div>
-  </div>
-
-  <!-- ════ FINISHED ════ -->
   <div class="sec-ttl mcw-section" data-s="finished" style="margin-top:22px">✅ &nbsp;Tamamlanan Maçlar</div>
+  @foreach (var item in finishedMatches)
+  {
+    <div class="mc-wrap mcw" data-s="finished">
+      <a asp-controller="Match" asp-action="MatchDetails" asp-route-id="@item.MatchId" class="mc">
+        <div class="mc-time"><div class="mc-min">@item.MatchDate.ToString("HH:mm")</div><div class="sbadge sb-fin">@item.StatusName</div></div>
+        <div class="dvv"></div>
+        <div class="mc-teams">
+          <div class="mc-tr">
+            <div class="tl-sm"><img src="@item.HomeLogoUrl" alt="@item.HomeTeamName" onerror="this.parentNode.textContent='EV'"/></div>
+            <span class="tn">@item.HomeTeamName</span><span class="ts">@item.HomeScore</span>
+          </div>
+          <div class="mc-tr">
+            <div class="tl-sm"><img src="@item.AwayLogoUrl" alt="@item.AwayTeamName" onerror="this.parentNode.textContent='DEP'"/></div>
+            <span class="tn">@item.AwayTeamName</span><span class="ts">@item.AwayScore</span>
+          </div>
+        </div>
+        <span class="det-btn"><i class="bi bi-chevron-right"></i> <span>Detay</span></span>
+      </a>
+    </div>
+  }
 
-  <div class="mc-wrap mcw" data-s="finished">
-    <a href="match-detail.html" class="mc">
-      <div class="mc-time"><div class="mc-min">16:30</div><div class="sbadge sb-fin">MS</div></div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="ARS" onerror="this.parentNode.textContent='ARS'"/></div>
-          <span class="tn">Arsenal</span><span class="ts">2</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="LIV" onerror="this.parentNode.textContent='LIV'"/></div>
-          <span class="tn">Liverpool</span><span class="ts">2</span>
-        </div>
-      </div>
-      <a href="match-detail.html" class="det-btn"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
-    </a>
-  </div>
-
-  <div class="mc-wrap mcw" data-s="finished">
-    <a href="#" class="mc">
-      <div class="mc-time"><div class="mc-min">14:00</div><div class="sbadge sb-fin">MS</div></div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg" alt="MCI" onerror="this.parentNode.textContent='MCI'"/></div>
-          <span class="tn">Manchester City</span><span class="ts win">3</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="CHE" onerror="this.parentNode.textContent='CHE'"/></div>
-          <span class="tn">Chelsea</span><span class="ts">1</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
-    </a>
-  </div>
-
-  <div class="mc-wrap mcw" data-s="finished">
-    <a href="#" class="mc">
-      <div class="mc-time"><div class="mc-min">12:30</div><div class="sbadge sb-fin">MS</div></div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg" alt="WOL" onerror="this.parentNode.textContent='WOL'"/></div>
-          <span class="tn">Wolves</span><span class="ts win">2</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg" alt="CRY" onerror="this.parentNode.textContent='CRY'"/></div>
-          <span class="tn">Crystal Palace</span><span class="ts">0</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
-    </a>
-  </div>
-
-  <div class="mc-wrap mcw" data-s="finished">
-    <a href="#" class="mc">
-      <div class="mc-time"><div class="mc-min">15:00</div><div class="sbadge sb-fin">MS</div></div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/2/2a/Brentford_FC_crest.svg" alt="BRE" onerror="this.parentNode.textContent='BRE'"/></div>
-          <span class="tn">Brentford</span><span class="ts">1</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg" alt="LEI" onerror="this.parentNode.textContent='LEI'"/></div>
-          <span class="tn">Leicester City</span><span class="ts win">3</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
-    </a>
-  </div>
-
-  <div class="mc-wrap mcw" data-s="finished">
-    <a href="#" class="mc">
-      <div class="mc-time"><div class="mc-min">20:45</div><div class="sbadge sb-fin">MS</div></div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg" alt="WHU" onerror="this.parentNode.textContent='WHU'"/></div>
-          <span class="tn">West Ham</span><span class="ts">1</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg" alt="EVE" onerror="this.parentNode.textContent='EVE'"/></div>
-          <span class="tn">Everton</span><span class="ts win">2</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-chevron-right"></i> <span>Detay</span></a>
-    </a>
-  </div>
-
-  <!-- ════ UPCOMING ════ -->
   <div class="sec-ttl mcw-section" data-s="upcoming" style="margin-top:22px">🕐 &nbsp;Yaklaşan Maçlar</div>
-
-  <div class="mc-wrap mcw" data-s="upcoming">
-    <a href="#" class="mc">
-      <div class="mc-time"><div class="mc-min bc">20:00</div><div class="sbadge sb-up">BUGÜN</div></div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_FC_logo.svg" alt="BHA" onerror="this.parentNode.textContent='BHA'"/></div>
-          <span class="tn">Brighton</span><span class="ts dim">—</span>
+  @foreach (var item in upcomingMatches)
+  {
+    <div class="mc-wrap mcw" data-s="upcoming">
+      <a asp-controller="Match" asp-action="MatchDetails" asp-route-id="@item.MatchId" class="mc">
+        <div class="mc-time"><div class="mc-min bc">@item.MatchDate.ToString("HH:mm")</div><div class="sbadge sb-up">@item.MatchDate.ToString("dd.MM")</div></div>
+        <div class="dvv"></div>
+        <div class="mc-teams">
+          <div class="mc-tr">
+            <div class="tl-sm"><img src="@item.HomeLogoUrl" alt="@item.HomeTeamName" onerror="this.parentNode.textContent='EV'"/></div>
+            <span class="tn">@item.HomeTeamName</span><span class="ts dim">—</span>
+          </div>
+          <div class="mc-tr">
+            <div class="tl-sm"><img src="@item.AwayLogoUrl" alt="@item.AwayTeamName" onerror="this.parentNode.textContent='DEP'"/></div>
+            <span class="tn">@item.AwayTeamName</span><span class="ts dim">—</span>
+          </div>
         </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg" alt="FUL" onerror="this.parentNode.textContent='FUL'"/></div>
-          <span class="tn">Fulham</span><span class="ts dim">—</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-calendar-check"></i> <span>Fikstür</span></a>
-    </a>
-  </div>
-
-  <div class="mc-wrap mcw" data-s="upcoming">
-    <a href="#" class="mc">
-      <div class="mc-time"><div class="mc-min bc">15:00</div><div class="sbadge sb-up">YARIN</div></div>
-      <div class="dvv"></div>
-      <div class="mc-teams">
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg" alt="IPS" onerror="this.parentNode.textContent='IPS'"/></div>
-          <span class="tn">Ipswich Town</span><span class="ts dim">—</span>
-        </div>
-        <div class="mc-tr">
-          <div class="tl-sm"><img src="https://upload.wikimedia.org/wikipedia/en/c/c9/FC_Southampton.svg" alt="SOU" onerror="this.parentNode.textContent='SOU'"/></div>
-          <span class="tn">Southampton</span><span class="ts dim">—</span>
-        </div>
-      </div>
-      <a href="#" class="det-btn" onclick="return false"><i class="bi bi-calendar-check"></i> <span>Fikstür</span></a>
-    </a>
-  </div>
+        <span class="det-btn"><i class="bi bi-calendar-check"></i> <span>Fikstür</span></span>
+      </a>
+    </div>
+  }
 
 </div>
 </main>

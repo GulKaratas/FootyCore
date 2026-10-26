@@ -1,16 +1,22 @@
-﻿using FootyCore.BusinessLayer.Abstract;
+using AutoMapper;
+using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DataAccessLayer.Abstract;
 using FootyCore.DtoLayer.SeasonDto;
 using FootyCore.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FootyCore.BusinessLayer.Concrete
 {
     public class SeasonManager : ISeasonService
     {
+        private readonly ISeasonDal _seasonDal;
+        private readonly IMapper _mapper;
+
+        public SeasonManager(ISeasonDal seasonDal, IMapper mapper)
+        {
+            _seasonDal = seasonDal;
+            _mapper = mapper;
+        }
+
         public Task TDelete(int id)
         {
             throw new NotImplementedException();
@@ -21,9 +27,10 @@ namespace FootyCore.BusinessLayer.Concrete
             throw new NotImplementedException();
         }
 
-        public Task<List<ResultSeasonDto>> TGetList()
+        public async Task<List<ResultSeasonDto>> TGetList()
         {
-            throw new NotImplementedException();
+            var values = (await _seasonDal.GetList()).OrderBy(x => x.SeasonId).ToList();
+            return _mapper.Map<List<ResultSeasonDto>>(values);
         }
 
         public Task TInsert(CreateSeasonDto dto)

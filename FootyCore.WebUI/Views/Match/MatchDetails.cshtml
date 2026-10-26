@@ -1,346 +1,295 @@
-﻿
+
+@model MatchDetailsViewModel
 @{
-     ViewData["Title"] = "MatchDetails";
-     Layout = "~/Views/Default/_IndexLayout.cshtml";
+    ViewData["Title"] = "MatchDetails";
+    Layout = "~/Views/Default/_IndexLayout.cshtml";
+
+    var culture = new CultureInfo("tr-TR");
+    var match = Model.Match;
+    var stat = Model.Statistic;
+    var events = Model.Details ?? new List<ResultMatchDetailDto>();
+    var goals = Model.Goals ?? new List<ResultMatchDetailDto>();
+    var cards = Model.Cards ?? new List<ResultMatchDetailDto>();
+    var subs = Model.Substitutions ?? new List<ResultMatchDetailDto>();
+
+    var homeGoals = goals.Where(x => match != null && x.TeamId == match.HomeTeamId).ToList();
+    var awayGoals = goals.Where(x => match != null && x.TeamId == match.AwayTeamId).ToList();
+    var homeCards = cards.Where(x => match != null && x.TeamId == match.HomeTeamId).ToList();
+    var awayCards = cards.Where(x => match != null && x.TeamId == match.AwayTeamId).ToList();
+    var homeSubs = subs.Where(x => match != null && x.TeamId == match.HomeTeamId).ToList();
+    var awaySubs = subs.Where(x => match != null && x.TeamId == match.AwayTeamId).ToList();
+
+    string Pair(int? home, int? away) => home.HasValue && away.HasValue ? $"{home}–{away}" : "—";
+    int Share(int home, int away)
+    {
+        var total = home + away;
+        return total == 0 ? 0 : home * 100 / total;
+    }
+    string InName(string description)
+    {
+        var parts = (description ?? "").Split('/');
+        return parts[0].Trim();
+    }
+    string OutName(string description)
+    {
+        var parts = (description ?? "").Split('/');
+        return parts.Length > 1 ? parts[1].Trim() : "";
+    }
+
+    var scoreText = match == null ? "—" : Pair(match.HomeScore, match.AwayScore);
+    var htText = stat == null ? "—" : $"{stat.HomeFirstHalfGoals}–{stat.AwayFirstHalfGoals}";
+    var secondText = stat == null ? "—" : $"{stat.HomeSecondHalfGoals}–{stat.AwaySecondHalfGoals}";
+    var homeShots = stat?.HomeShots ?? 0;
+    var awayShots = stat?.AwayShots ?? 0;
+    var homeOnTarget = stat?.HomeShotsOnTarget ?? 0;
+    var awayOnTarget = stat?.AwayShotsOnTarget ?? 0;
+    var homePossession = stat?.HomePossession ?? 0;
+    var awayPossession = stat?.AwayPossession ?? 0;
+    var shotShare = Share(homeShots, awayShots);
+    var targetShare = Share(homeOnTarget, awayOnTarget);
+    var homeYellow = homeCards.Count(x => x.ActionType == "Sarı Kart");
+    var awayYellow = awayCards.Count(x => x.ActionType == "Sarı Kart");
+    var homeRed = homeCards.Count(x => x.ActionType == "Kırmızı Kart");
+    var awayRed = awayCards.Count(x => x.ActionType == "Kırmızı Kart");
+    var printedHalf = false;
 }
 
-
-<!-- HERO -->
 <section class="hero">
   <div class="wrap">
-    <div class="hero-badges">
-      <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>Premier League · Hafta 33</span>
-      <span class="hbadge hb-gray"><i class="bi bi-check2-circle me-1"></i>Maç Sona Erdi</span>
-      <span class="hbadge hb-green"><i class="bi bi-people-fill me-1"></i>60,260 Seyirci</span>
-    </div>
-    <div class="hero-grid">
-      <div class="h-team">
-        <div class="h-logo" style="border-color:rgba(239,1,7,.5);box-shadow:0 0 28px rgba(239,1,7,.1)">
-          <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="ARS" onerror="this.parentNode.textContent='ARS'"/>
+    @if (match == null || match.MatchId == 0)
+    {
+        <h1 class="pg-title">Maç bulunamadı</h1>
+    }
+    else
+    {
+        <div class="hero-badges">
+          <span class="hbadge hb-gold"><i class="bi bi-trophy-fill me-1"></i>@match.LeagueName · Hafta @match.Week</span>
+          <span class="hbadge hb-gray"><i class="bi bi-check2-circle me-1"></i>@match.StatusName</span>
         </div>
-        <div class="h-name">Arsenal</div>
-        <div class="h-type">Ev Sahibi</div>
-      </div>
-      <div class="h-score-c">
-        <div class="h-sc">2–2</div>
-        <div class="h-ht"><i class="bi bi-hourglass-split me-1"></i>İY: 1–1</div>
-        <div class="h-ft">Maç Bitti</div>
-      </div>
-      <div class="h-team">
-        <div class="h-logo" style="border-color:rgba(200,16,46,.5);box-shadow:0 0 28px rgba(200,16,46,.1)">
-          <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="LIV" onerror="this.parentNode.textContent='LIV'"/>
+        <div class="hero-grid">
+          <div class="h-team">
+            <div class="h-logo">
+              <img src="@match.HomeLogoUrl" alt="@match.HomeTeamName" onerror="this.parentNode.textContent='@match.HomeTeamName'" />
+            </div>
+            <div class="h-name">@match.HomeTeamName</div>
+            <div class="h-type">Ev Sahibi</div>
+          </div>
+          <div class="h-score-c">
+            <div class="h-sc">@scoreText</div>
+            <div class="h-ht"><i class="bi bi-hourglass-split me-1"></i>İY: @htText</div>
+            <div class="h-ft">@match.StatusName</div>
+          </div>
+          <div class="h-team">
+            <div class="h-logo">
+              <img src="@match.AwayLogoUrl" alt="@match.AwayTeamName" onerror="this.parentNode.textContent='@match.AwayTeamName'" />
+            </div>
+            <div class="h-name">@match.AwayTeamName</div>
+            <div class="h-type">Deplasman</div>
+          </div>
         </div>
-        <div class="h-name">Liverpool</div>
-        <div class="h-type">Deplasman</div>
-      </div>
-    </div>
-    <div class="info-strip">
-      <div class="istrip"><i class="bi bi-geo-alt-fill"></i><span>Emirates Stadium, Londra</span></div>
-      <div class="istrip"><i class="bi bi-calendar3"></i><span>12 Nisan 2025</span></div>
-      <div class="istrip"><i class="bi bi-clock"></i><span>16:30</span></div>
-      <div class="istrip"><i class="bi bi-person-badge"></i><span>Michael Oliver</span></div>
-    </div>
+        <div class="info-strip">
+          <div class="istrip"><i class="bi bi-geo-alt-fill"></i><span>@match.StadiumName, @match.City</span></div>
+          <div class="istrip"><i class="bi bi-calendar3"></i><span>@match.MatchDate.ToString("dd MMMM yyyy", culture)</span></div>
+          <div class="istrip"><i class="bi bi-clock"></i><span>@match.MatchDate.ToString("HH:mm", culture)</span></div>
+        </div>
+    }
   </div>
 </section>
 
-<!-- CONTENT -->
 <div class="content">
 <div class="wrap">
-  <a href="index.html" class="back-btn"><i class="bi bi-arrow-left"></i> Maç Listesine Dön</a>
+  <a asp-controller="Match" asp-action="MatchList" class="back-btn"><i class="bi bi-arrow-left"></i> Maç Listesine Dön</a>
 
+  @if (match != null && match.MatchId != 0)
+  {
   <div class="row g-4">
-
-    <!-- LEFT: Timeline, Goals, Cards, Subs -->
     <div class="col-lg-7">
-
-      <!-- TIMELINE -->
       <div class="dc">
         <div class="dc-title"><i class="bi bi-activity me-2" style="color:var(--green)"></i>Maç Olayları</div>
         <div class="tl-wrap">
           <div class="tl-line"></div>
+          @foreach (var item in events)
+          {
+              if (!printedHalf && item.Minute > 45)
+              {
+                  printedHalf = true;
+                  <div class="tl-ev">
+                    <div class="tl-home"></div>
+                    <div class="tl-min-c"><div class="min-b" style="background:rgba(255,193,7,.09);border-color:rgba(255,193,7,.22);color:var(--yellow)">İY</div></div>
+                    <div class="tl-away"></div>
+                  </div>
+              }
 
-          <!-- 12' Saka Goal -->
-          <div class="tl-ev">
-            <div class="tl-home">
-              <div class="chip home goal-ev">
-                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
-                <div><div class="ev-pl">Bukayo Saka</div><div class="ev-dt">Sol Köşe</div></div>
+              var isHome = item.TeamId == match.HomeTeamId;
+              var chipClass = item.ActionType == "Gol" ? "goal-ev" : item.ActionType == "Sarı Kart" ? "yel-ev" : item.ActionType == "Kırmızı Kart" ? "red-ev" : "sub-ev";
+              var iconClass = item.ActionType == "Gol" ? "ei-goal" : item.ActionType == "Sarı Kart" ? "ei-yel" : item.ActionType == "Kırmızı Kart" ? "ei-red" : "ei-sub";
+              var icon = item.ActionType == "Değişiklik" ? "bi-arrow-left-right" : item.ActionType == "Gol" ? "bi-circle-fill" : "bi-square-fill";
+              <div class="tl-ev">
+                <div class="tl-home">
+                  @if (isHome)
+                  {
+                      <div class="chip home @chipClass">
+                        <div class="ev-ico @iconClass"><i class="bi @icon" style="font-size:10px"></i></div>
+                        <div><div class="ev-pl">@item.Description</div><div class="ev-dt">@item.ActionType</div></div>
+                      </div>
+                  }
+                </div>
+                <div class="tl-min-c"><div class="min-b">@item.Minute'</div></div>
+                <div class="tl-away">
+                  @if (!isHome)
+                  {
+                      <div class="chip away @chipClass">
+                        <div class="ev-ico @iconClass"><i class="bi @icon" style="font-size:10px"></i></div>
+                        <div><div class="ev-pl">@item.Description</div><div class="ev-dt">@item.ActionType</div></div>
+                      </div>
+                  }
+                </div>
               </div>
-            </div>
-            <div class="tl-min-c"><div class="min-b">12'</div></div>
-            <div class="tl-away"></div>
-          </div>
-
-          <!-- 27' Yellow Rice -->
-          <div class="tl-ev">
-            <div class="tl-home">
-              <div class="chip home yel-ev">
-                <div class="ev-ico ei-yel"><i class="bi bi-square-fill" style="font-size:10px"></i></div>
-                <div><div class="ev-pl">Declan Rice</div><div class="ev-dt">Foul</div></div>
+          }
+          @if (match.StatusName != null && match.StatusName.Contains("Bitti"))
+          {
+              <div class="tl-ev">
+                <div class="tl-home"></div>
+                <div class="tl-min-c"><div class="min-b" style="background:rgba(143,163,200,.08);border-color:rgba(143,163,200,.18);color:var(--t2)">MS</div></div>
+                <div class="tl-away"></div>
               </div>
-            </div>
-            <div class="tl-min-c"><div class="min-b">27'</div></div>
-            <div class="tl-away"></div>
-          </div>
-
-          <!-- 39' Salah Goal -->
-          <div class="tl-ev">
-            <div class="tl-home"></div>
-            <div class="tl-min-c"><div class="min-b">39'</div></div>
-            <div class="tl-away">
-              <div class="chip away goal-ev">
-                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
-                <div><div class="ev-pl">M. Salah</div><div class="ev-dt">Düz Şut</div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- HT -->
-          <div class="tl-ev">
-            <div class="tl-home"></div>
-            <div class="tl-min-c">
-              <div class="min-b" style="background:rgba(255,193,7,.09);border-color:rgba(255,193,7,.22);color:var(--yellow)">İY</div>
-            </div>
-            <div class="tl-away"></div>
-          </div>
-
-          <!-- 52' Sub Arsenal -->
-          <div class="tl-ev">
-            <div class="tl-home">
-              <div class="chip home sub-ev">
-                <div class="ev-ico ei-sub"><i class="bi bi-arrow-left-right"></i></div>
-                <div><div class="ev-pl">Trossard ↑</div><div class="ev-dt">Martinelli ↓</div></div>
-              </div>
-            </div>
-            <div class="tl-min-c"><div class="min-b">52'</div></div>
-            <div class="tl-away"></div>
-          </div>
-
-          <!-- 61' Havertz Goal -->
-          <div class="tl-ev">
-            <div class="tl-home">
-              <div class="chip home goal-ev">
-                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
-                <div><div class="ev-pl">Kai Havertz</div><div class="ev-dt">Kafa Golü</div></div>
-              </div>
-            </div>
-            <div class="tl-min-c"><div class="min-b">61'</div></div>
-            <div class="tl-away"></div>
-          </div>
-
-          <!-- 68' Yellow Van Dijk -->
-          <div class="tl-ev">
-            <div class="tl-home"></div>
-            <div class="tl-min-c"><div class="min-b">68'</div></div>
-            <div class="tl-away">
-              <div class="chip away yel-ev">
-                <div class="ev-ico ei-yel"><i class="bi bi-square-fill" style="font-size:10px"></i></div>
-                <div><div class="ev-pl">Van Dijk</div><div class="ev-dt">Müdahale</div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 72' Sub Liverpool -->
-          <div class="tl-ev">
-            <div class="tl-home"></div>
-            <div class="tl-min-c"><div class="min-b">72'</div></div>
-            <div class="tl-away">
-              <div class="chip away sub-ev">
-                <div class="ev-ico ei-sub"><i class="bi bi-arrow-left-right"></i></div>
-                <div><div class="ev-pl">D. Núñez ↑</div><div class="ev-dt">L. Díaz ↓</div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 78' Red Calafiori -->
-          <div class="tl-ev">
-            <div class="tl-home">
-              <div class="chip home red-ev">
-                <div class="ev-ico ei-red"><i class="bi bi-square-fill" style="font-size:10px"></i></div>
-                <div><div class="ev-pl">Calafiori</div><div class="ev-dt">2. Sarı / Kırmızı</div></div>
-              </div>
-            </div>
-            <div class="tl-min-c"><div class="min-b">78'</div></div>
-            <div class="tl-away"></div>
-          </div>
-
-          <!-- 84' Nunez Goal -->
-          <div class="tl-ev">
-            <div class="tl-home"></div>
-            <div class="tl-min-c"><div class="min-b">84'</div></div>
-            <div class="tl-away">
-              <div class="chip away goal-ev">
-                <div class="ev-ico ei-goal"><i class="bi bi-circle-fill" style="font-size:9px"></i></div>
-                <div><div class="ev-pl">D. Núñez</div><div class="ev-dt">Penaltı</div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- FT -->
-          <div class="tl-ev">
-            <div class="tl-home"></div>
-            <div class="tl-min-c">
-              <div class="min-b" style="background:rgba(143,163,200,.08);border-color:rgba(143,163,200,.18);color:var(--t2)">MS</div>
-            </div>
-            <div class="tl-away"></div>
-          </div>
-
+          }
         </div>
       </div>
 
-      <!-- GOALS -->
       <div class="dc">
         <div class="dc-title"><i class="bi bi-circle-fill me-2" style="color:var(--green);font-size:9px"></i>Goller</div>
         <div class="split2">
           <div class="box2">
-            <div class="box2-title">⚽ Arsenal</div>
-            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">Bukayo Saka</div><div class="gl-min">12'</div></div>
-            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">Kai Havertz</div><div class="gl-min">61'</div></div>
+            <div class="box2-title">⚽ @match.HomeTeamName</div>
+            @foreach (var goal in homeGoals)
+            {
+                <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">@goal.Description</div><div class="gl-min">@goal.Minute'</div></div>
+            }
           </div>
           <div class="box2">
-            <div class="box2-title">⚽ Liverpool</div>
-            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">M. Salah</div><div class="gl-min">39'</div></div>
-            <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">D. Núñez</div><div class="gl-min">84'</div></div>
+            <div class="box2-title">⚽ @match.AwayTeamName</div>
+            @foreach (var goal in awayGoals)
+            {
+                <div class="gl"><div class="gl-ico">⚽</div><div class="gl-pl">@goal.Description</div><div class="gl-min">@goal.Minute'</div></div>
+            }
           </div>
         </div>
       </div>
 
-      <!-- CARDS -->
       <div class="dc">
         <div class="dc-title"><i class="bi bi-square-fill me-2" style="color:var(--yellow);font-size:10px"></i>Kartlar</div>
         <div class="split2">
           <div class="box2">
-            <div class="box2-title">Arsenal</div>
-            <div class="gl"><div class="ycard"></div><div class="gl-pl">Declan Rice</div><div class="gl-min">27'</div></div>
-            <div class="gl"><div class="ycard"></div><div class="gl-pl">Calafiori</div><div class="gl-min">74'</div></div>
-            <div class="gl"><div class="rcard"></div><div class="gl-pl">Calafiori</div><div class="gl-min">78'</div></div>
+            <div class="box2-title">@match.HomeTeamName</div>
+            @foreach (var card in homeCards)
+            {
+                <div class="gl">
+                  <div class="@(card.ActionType == "Kırmızı Kart" ? "rcard" : "ycard")"></div>
+                  <div class="gl-pl">@card.Description</div>
+                  <div class="gl-min">@card.Minute'</div>
+                </div>
+            }
           </div>
           <div class="box2">
-            <div class="box2-title">Liverpool</div>
-            <div class="gl"><div class="ycard"></div><div class="gl-pl">Van Dijk</div><div class="gl-min">68'</div></div>
-            <div class="gl"><div class="ycard"></div><div class="gl-pl">Curtis Jones</div><div class="gl-min">88'</div></div>
+            <div class="box2-title">@match.AwayTeamName</div>
+            @foreach (var card in awayCards)
+            {
+                <div class="gl">
+                  <div class="@(card.ActionType == "Kırmızı Kart" ? "rcard" : "ycard")"></div>
+                  <div class="gl-pl">@card.Description</div>
+                  <div class="gl-min">@card.Minute'</div>
+                </div>
+            }
           </div>
         </div>
       </div>
 
-      <!-- SUBSTITUTIONS -->
       <div class="dc">
         <div class="dc-title"><i class="bi bi-arrow-left-right me-2" style="color:var(--blue)"></i>Oyuncu Değişiklikleri</div>
-        <div class="sub-lbl">Arsenal</div>
-        <div class="sub-r">
-          <div class="sub-min">52'</div>
-          <div class="sub-in">↑ Trossard</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Martinelli</div>
-        </div>
-        <div class="sub-r">
-          <div class="sub-min">65'</div>
-          <div class="sub-in">↑ Odegaard</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Jorginho</div>
-        </div>
-        <div class="sub-r">
-          <div class="sub-min">79'</div>
-          <div class="sub-in">↑ Kiwior</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Calafiori (K.K.)</div>
-        </div>
-        <div class="sub-lbl">Liverpool</div>
-        <div class="sub-r">
-          <div class="sub-min">72'</div>
-          <div class="sub-in">↑ D. Núñez</div><div class="sub-arr">⇄</div><div class="sub-out">↓ L. Díaz</div>
-        </div>
-        <div class="sub-r">
-          <div class="sub-min">80'</div>
-          <div class="sub-in">↑ H. Elliott</div><div class="sub-arr">⇄</div><div class="sub-out">↓ Gakpo</div>
-        </div>
-        <div class="sub-r">
-          <div class="sub-min">85'</div>
-          <div class="sub-in">↑ Robertson</div><div class="sub-arr">⇄</div><div class="sub-out">↓ C. Jones</div>
-        </div>
+        <div class="sub-lbl">@match.HomeTeamName</div>
+        @foreach (var sub in homeSubs)
+        {
+            <div class="sub-r">
+              <div class="sub-min">@sub.Minute'</div>
+              <div class="sub-in">↑ @InName(sub.Description)</div>
+              <div class="sub-arr">⇄</div>
+              <div class="sub-out">↓ @OutName(sub.Description)</div>
+            </div>
+        }
+        <div class="sub-lbl">@match.AwayTeamName</div>
+        @foreach (var sub in awaySubs)
+        {
+            <div class="sub-r">
+              <div class="sub-min">@sub.Minute'</div>
+              <div class="sub-in">↑ @InName(sub.Description)</div>
+              <div class="sub-arr">⇄</div>
+              <div class="sub-out">↓ @OutName(sub.Description)</div>
+            </div>
+        }
       </div>
-
     </div>
 
-    <!-- RIGHT: Summary, Stats, Match Info -->
     <div class="col-lg-5">
-
-      <!-- SCORE SUMMARY -->
       <div class="dc">
         <div class="dc-title"><i class="bi bi-bar-chart-fill me-2" style="color:var(--blue)"></i>Maç Özeti</div>
         <div class="sc-pills">
-          <div class="sc-pill"><div class="sp-lbl">İlk Yarı</div><div class="sp-val">1–1</div></div>
-          <div class="sc-pill"><div class="sp-lbl">İkinci Yarı</div><div class="sp-val">1–1</div></div>
-          <div class="sc-pill"><div class="sp-lbl">Sonuç</div><div class="sp-val" style="color:var(--green)">2–2</div></div>
+          <div class="sc-pill"><div class="sp-lbl">İlk Yarı</div><div class="sp-val">@htText</div></div>
+          <div class="sc-pill"><div class="sp-lbl">İkinci Yarı</div><div class="sp-val">@secondText</div></div>
+          <div class="sc-pill"><div class="sp-lbl">Sonuç</div><div class="sp-val" style="color:var(--green)">@scoreText</div></div>
         </div>
       </div>
 
-      <!-- STATISTICS -->
       <div class="dc">
         <div class="dc-title"><i class="bi bi-graph-up me-2" style="color:var(--green)"></i>İstatistikler</div>
+        <div class="stat-r"><div class="sv-h">@homePossession%</div><div class="sl">Topa Sahip Olma</div><div class="sv-a">@awayPossession%</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:@homePossession%"></div></div><div></div><div class="ba"><div class="f" style="width:@awayPossession%"></div></div></div>
 
-        <div class="stat-r"><div class="sv-h">55%</div><div class="sl">Topa Sahip Olma</div><div class="sv-a">45%</div></div>
-        <div class="bar-r"><div class="bh"><div class="f" style="width:55%"></div></div><div></div><div class="ba"><div class="f" style="width:45%"></div></div></div>
+        <div class="stat-r"><div class="sv-h">@homeShots</div><div class="sl">Şut</div><div class="sv-a">@awayShots</div></div>
+        <div class="bar-r"><div class="bh"><div class="f" style="width:@shotShare%"></div></div><div></div><div class="ba"><div class="f" style="width:@(100 - shotShare)%"></div></div></div>
 
-        <div class="stat-r"><div class="sv-h">14</div><div class="sl">Şut</div><div class="sv-a">10</div></div>
-        <div class="bar-r"><div class="bh"><div class="f" style="width:58%"></div></div><div></div><div class="ba"><div class="f" style="width:42%"></div></div></div>
-
-        <div class="stat-r"><div class="sv-h">6</div><div class="sl">İsabetli Şut</div><div class="sv-a">5</div></div>
-        <div class="bar-r"><div class="bh"><div class="f" style="width:55%"></div></div><div></div><div class="ba"><div class="f" style="width:45%"></div></div></div>
-
-        <div class="stat-r"><div class="sv-h">478</div><div class="sl">Pas</div><div class="sv-a">392</div></div>
-        <div class="bar-r"><div class="bh"><div class="f" style="width:55%"></div></div><div></div><div class="ba"><div class="f" style="width:45%"></div></div></div>
-
-        <div class="stat-r"><div class="sv-h">87%</div><div class="sl">Pas İsabeti</div><div class="sv-a">83%</div></div>
-        <div class="bar-r"><div class="bh"><div class="f" style="width:51%"></div></div><div></div><div class="ba"><div class="f" style="width:49%"></div></div></div>
-
-        <div class="stat-r"><div class="sv-h">6</div><div class="sl">Korner</div><div class="sv-a">4</div></div>
-        <div class="bar-r"><div class="bh"><div class="f" style="width:60%"></div></div><div></div><div class="ba"><div class="f" style="width:40%"></div></div></div>
-
-        <div class="stat-r"><div class="sv-h">11</div><div class="sl">Faul</div><div class="sv-a">14</div></div>
-        <div class="bar-r"><div class="bh"><div class="f" style="width:44%"></div></div><div></div><div class="ba"><div class="f" style="width:56%"></div></div></div>
-
-        <div class="stat-r"><div class="sv-h">2</div><div class="sl">Ofsayt</div><div class="sv-a">3</div></div>
-        <div class="bar-r" style="margin-bottom:14px"><div class="bh"><div class="f" style="width:40%"></div></div><div></div><div class="ba"><div class="f" style="width:60%"></div></div></div>
+        <div class="stat-r"><div class="sv-h">@homeOnTarget</div><div class="sl">İsabetli Şut</div><div class="sv-a">@awayOnTarget</div></div>
+        <div class="bar-r" style="margin-bottom:14px"><div class="bh"><div class="f" style="width:@targetShare%"></div></div><div></div><div class="ba"><div class="f" style="width:@(100 - targetShare)%"></div></div></div>
 
         <div class="stat-r" style="margin-bottom:0">
-          <div class="sv-h" style="color:var(--yellow)">2</div>
+          <div class="sv-h" style="color:var(--yellow)">@homeYellow</div>
           <div class="sl">Sarı Kart</div>
-          <div class="sv-a" style="color:var(--yellow)">2</div>
+          <div class="sv-a" style="color:var(--yellow)">@awayYellow</div>
         </div>
         <div class="stat-r" style="margin-bottom:0;margin-top:8px">
-          <div class="sv-h" style="color:var(--red)">1</div>
+          <div class="sv-h" style="color:var(--red)">@homeRed</div>
           <div class="sl">Kırmızı Kart</div>
-          <div class="sv-a" style="color:var(--t3)">0</div>
+          <div class="sv-a" style="color:var(--t3)">@awayRed</div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;margin-top:18px;
-          padding-top:14px;border-top:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
           <div style="display:flex;align-items:center;gap:7px">
             <div style="width:9px;height:9px;border-radius:50%;background:var(--blue)"></div>
-            <span style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t2)">Arsenal</span>
+            <span style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t2)">@match.HomeTeamName</span>
           </div>
           <div style="display:flex;align-items:center;gap:7px">
-            <span style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t2)">Liverpool</span>
+            <span style="font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t2)">@match.AwayTeamName</span>
             <div style="width:9px;height:9px;border-radius:50%;background:var(--live)"></div>
           </div>
         </div>
       </div>
 
-      <!-- MATCH INFO -->
       <div class="dc">
         <div class="dc-title"><i class="bi bi-info-circle me-2" style="color:var(--t3)"></i>Maç Bilgileri</div>
-        <div class="mi-row"><span class="mi-key">Lig</span><span class="mi-val" style="color:var(--gold)">Premier League</span></div>
-        <div class="mi-row"><span class="mi-key">Sezon</span><span class="mi-val">2024 / 2025</span></div>
-        <div class="mi-row"><span class="mi-key">Hafta</span><span class="mi-val">Hafta 33</span></div>
-        <div class="mi-row"><span class="mi-key">Stadyum</span><span class="mi-val">Emirates Stadium</span></div>
-        <div class="mi-row"><span class="mi-key">Şehir</span><span class="mi-val">Londra, İngiltere</span></div>
-        <div class="mi-row"><span class="mi-key">Seyirci</span><span class="mi-val">60,260</span></div>
-        <div class="mi-row"><span class="mi-key">Hakem</span><span class="mi-val">Michael Oliver</span></div>
-        <div class="mi-row"><span class="mi-key">Tarih</span><span class="mi-val">12 Nisan 2025</span></div>
-        <div class="mi-row"><span class="mi-key">Saat</span><span class="mi-val">16:30</span></div>
+        <div class="mi-row"><span class="mi-key">Lig</span><span class="mi-val" style="color:var(--gold)">@match.LeagueName</span></div>
+        <div class="mi-row"><span class="mi-key">Sezon</span><span class="mi-val">@match.SeasonName</span></div>
+        <div class="mi-row"><span class="mi-key">Hafta</span><span class="mi-val">Hafta @match.Week</span></div>
+        <div class="mi-row"><span class="mi-key">Stadyum</span><span class="mi-val">@match.StadiumName</span></div>
+        <div class="mi-row"><span class="mi-key">Şehir</span><span class="mi-val">@match.City</span></div>
+        <div class="mi-row"><span class="mi-key">Tarih</span><span class="mi-val">@match.MatchDate.ToString("dd MMMM yyyy", culture)</span></div>
+        <div class="mi-row"><span class="mi-key">Saat</span><span class="mi-val">@match.MatchDate.ToString("HH:mm", culture)</span></div>
       </div>
-
     </div>
   </div>
+  }
 
   <div class="mt-2">
-    <a href="index.html" class="back-btn"><i class="bi bi-arrow-left"></i> Tüm Maçlara Dön</a>
+    <a asp-controller="Match" asp-action="MatchList" class="back-btn"><i class="bi bi-arrow-left"></i> Tüm Maçlara Dön</a>
   </div>
 </div>
 </div>
-

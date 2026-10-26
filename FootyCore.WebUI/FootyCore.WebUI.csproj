@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FootyCore.BusinessLayer\FootyCore.BusinessLayer.csproj" />
     <ProjectReference Include="..\FootyCore.DtoLayer\FootyCore.DtoLayer.csproj" />
   </ItemGroup>
 

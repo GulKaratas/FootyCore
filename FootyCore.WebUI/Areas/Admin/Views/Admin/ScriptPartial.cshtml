@@ -1,0 +1,51 @@
+﻿<script>
+  // Mobile sidebar toggle
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    sidebarBackdrop.classList.toggle('active');
+  });
+
+  sidebarBackdrop.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    sidebarBackdrop.classList.remove('active');
+  });
+
+  // Home & Away same team validation
+  const homeTeam = document.getElementById('homeTeam');
+  const awayTeam = document.getElementById('awayTeam');
+  const sameTeamAlert = document.getElementById('sameTeamAlert');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function validateTeams() {
+    if (homeTeam.value === awayTeam.value) {
+      sameTeamAlert.style.display = 'block';
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.6';
+    } else {
+      sameTeamAlert.style.display = 'none';
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  }
+
+  homeTeam.addEventListener('change', validateTeams);
+  awayTeam.addEventListener('change', validateTeams);
+
+  // Form submit success toast
+  const matchForm = document.getElementById('matchForm');
+  const successToast = document.getElementById('successToast');
+
+  matchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (homeTeam.value === awayTeam.value) return;
+
+    successToast.style.display = 'block';
+    setTimeout(() => {
+      successToast.style.display = 'none';
+    }, 3200);
+  });
+</script>

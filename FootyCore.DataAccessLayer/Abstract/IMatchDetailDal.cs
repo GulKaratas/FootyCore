@@ -1,13 +1,9 @@
-﻿using FootyCore.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FootyCore.EntityLayer.Entities;
 
 namespace FootyCore.DataAccessLayer.Abstract
 {
-    public interface IMatchDetailDal :IGenericDal<MatchDetail>
+    public interface IMatchDetailDal : IGenericDal<MatchDetail>
     {
+        Task<List<MatchDetail>> GetDetailsByMatchIdAsync(int matchId);
     }
 }

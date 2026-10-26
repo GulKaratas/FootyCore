@@ -1,4 +1,4 @@
-﻿using FootyCore.BusinessLayer.Abstract;
+using FootyCore.BusinessLayer.Abstract;
 using FootyCore.DtoLayer.MatchDto;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +9,20 @@ namespace FootyCore.Api.Controllers
     public class MatchController : ControllerBase
     {
         private readonly IMatchService _matchService;
+        private readonly IMatchDetailService _matchDetailService;
 
-        public MatchController(IMatchService matchService)
+        public MatchController(IMatchService matchService, IMatchDetailService matchDetailService)
         {
             _matchService = matchService;
+            _matchDetailService = matchDetailService;
+        }
+
+
+        [HttpGet("season/{seasonId}/week/{week}")]
+        public async Task<IActionResult> GetMatchesBySeasonAndWeek(int seasonId, int week)
+        {
+            var value = await _matchService.GetMatchesBySeasonAndWeekAsync(seasonId, week);
+            return Ok(value);
         }
 
         [HttpGet]
@@ -41,6 +51,17 @@ namespace FootyCore.Api.Controllers
         {
             await _matchService.TUpdate(dto);
             return Ok("Maç Başarıyla Güncellendi");
+        }
+
+        [HttpGet("{id}/details")]
+        public async Task<IActionResult> GetMatchDetails(int id)
+        {
+            var match = await _matchService.GetMatchDetailsByIdAsync(id);
+            if (match == null)
+                return NotFound();
+
+            match.Details = await _matchDetailService.GetDetailsByMatchIdAsync(id);
+            return Ok(match);
         }
 
         [HttpGet("{id}")]

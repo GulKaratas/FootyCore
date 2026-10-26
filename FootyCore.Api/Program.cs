@@ -17,7 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ILeagueService, LeagueManager>();
 builder.Services.AddScoped<ILeagueDal, EfLeagueDal>();
-
+builder.Services.AddScoped<IStandingService, StandingManager>();
 builder.Services.AddScoped<IMatchService, MatchManager>();
 builder.Services.AddScoped<IMatchDal, EfMatchDal>();
 
