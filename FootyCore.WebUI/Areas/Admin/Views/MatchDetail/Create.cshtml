@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Yeni Maç Olayı";
     Layout = "~/Areas/Admin/Views/Admin/_IndexLayout.cshtml";
-    var selected = Model.Matches.FirstOrDefault(x => x.MatchId == Model.MatchId) ?? Model.Matches.FirstOrDefault();
+    var selected = Model.MatchId == 0 ? null : Model.Matches.FirstOrDefault(x => x.MatchId == Model.MatchId);
     var banner = selected == null
         ? "Müsabaka seçilmedi"
         : (string.IsNullOrWhiteSpace(selected.HomeTeamName) ? "Ev" : selected.HomeTeamName)
@@ -46,6 +46,7 @@
                         <div class="flex flex-col gap-space-xs md:col-span-2">
                             <label class="font-label-md font-semibold" asp-for="MatchId">Hedef müsabaka</label>
                             <select asp-for="MatchId" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none" id="matchId">
+                                <option value="0">Müsabaka seçin</option>
                                 @if (Model.Matches.Count == 0)
                                 {
                                     <option value="0">Kayıtlı maç yok</option>
@@ -54,7 +55,7 @@
                                 {
                                     var home = string.IsNullOrWhiteSpace(match.HomeTeamName) ? "Ev" : match.HomeTeamName;
                                     var away = string.IsNullOrWhiteSpace(match.AwayTeamName) ? "Deplasman" : match.AwayTeamName;
-                                    <option value="@match.MatchId" data-label="@home vs @away" data-sub="@(match.Week). hafta · @match.StadiumName">@home vs @away (@(match.Week). hafta)</option>
+                                    <option value="@match.MatchId" data-label="@home vs @away" data-sub="@(match.Week). hafta · @match.StadiumName" data-home-id="@match.HomeTeamId" data-away-id="@match.AwayTeamId" data-home="@home" data-away="@away">@home vs @away (@(match.Week). hafta)</option>
                                 }
                             </select>
                         </div>
@@ -62,6 +63,7 @@
                         <div class="flex flex-col gap-space-xs">
                             <label class="font-label-md font-semibold" asp-for="ActionType">Olay türü</label>
                             <select asp-for="ActionType" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none">
+                                <option value="">Olay türü seçin</option>
                                 <option>Gol</option>
                                 <option>Sarı Kart</option>
                                 <option>Kırmızı Kart</option>
@@ -71,12 +73,7 @@
 
                         <div class="flex flex-col gap-space-xs">
                             <label class="font-label-md font-semibold" asp-for="TeamId">İlgili kulüp</label>
-                            <select asp-for="TeamId" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none">
-                                @foreach (var team in Model.Teams)
-                                {
-                                    <option value="@team.TeamId">@team.TeamName</option>
-                                }
-                            </select>
+                            <select asp-for="TeamId" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none" id="teamId"></select>
                         </div>
 
                         <div class="flex flex-col gap-space-xs">
@@ -112,16 +109,42 @@
     <script>
         (function () {
             var select = document.getElementById("matchId");
+            var team = document.getElementById("teamId");
             var title = document.getElementById("eventBanner");
             var sub = document.getElementById("eventBannerSub");
+            function addClub(id, name) {
+                if (!team || !id || id === "0") return;
+                var opt = document.createElement("option");
+                opt.value = id;
+                opt.textContent = name;
+                team.appendChild(opt);
+            }
             function refresh() {
-                if (!select || !title || !sub) return;
+                if (!select) return;
                 var option = select.options[select.selectedIndex];
-                if (!option) return;
-                title.textContent = option.getAttribute("data-label") || option.text;
-                sub.textContent = option.getAttribute("data-sub") || "";
+                if (!option || !option.value || option.value === "0") {
+                    if (title) title.textContent = "Müsabaka seçilmedi";
+                    if (sub) sub.textContent = "Listeden bir maç seç";
+                    if (team) team.innerHTML = "";
+                    return;
+                }
+                if (title) title.textContent = option.getAttribute("data-label") || option.text;
+                if (sub) sub.textContent = option.getAttribute("data-sub") || "";
+                if (!team) return;
+                var current = team.value;
+                team.innerHTML = "";
+                var blank = document.createElement("option");
+                blank.value = "";
+                blank.textContent = "Kulüp seçin";
+                team.appendChild(blank);
+                addClub(option.getAttribute("data-home-id"), option.getAttribute("data-home"));
+                addClub(option.getAttribute("data-away-id"), option.getAttribute("data-away"));
+                for (var i = 0; i < team.options.length; i++) {
+                    if (team.options[i].value === current) team.selectedIndex = i;
+                }
             }
             if (select) select.addEventListener("change", refresh);
+            refresh();
         })();
     </script>
 }

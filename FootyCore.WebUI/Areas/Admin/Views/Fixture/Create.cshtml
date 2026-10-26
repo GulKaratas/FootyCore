@@ -35,7 +35,6 @@
                 </div>
 
                 <form method="post" class="flex flex-col gap-space-xl" id="fixtureForm">
-                    <input type="hidden" asp-for="StatusName" />
                     <input type="hidden" asp-for="HomeLogoUrl" />
                     <input type="hidden" asp-for="AwayLogoUrl" />
 
@@ -69,6 +68,15 @@
                             <input asp-for="Week" type="number" min="1" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="leagueWeek" />
                         </div>
                         <div class="flex flex-col gap-space-xs md:col-span-2">
+                            <label class="font-label-lg text-tertiary font-semibold" asp-for="StatusName">Durum</label>
+                            <select asp-for="StatusName" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="matchStatus">
+                                @foreach (var status in Model.Statuses)
+                                {
+                                    <option>@status.StatusName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-space-xs md:col-span-2">
                             <label class="font-label-lg text-tertiary font-semibold" asp-for="StadiumName">Stadyum</label>
                             <select asp-for="StadiumName" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="stadium">
                                 <option value="">Stadyum seçin</option>
@@ -97,7 +105,7 @@
         </div>
         <div class="lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-md p-space-lg">
             <h3 class="font-headline-sm text-on-surface mb-space-sm">Kayıt</h3>
-            <p class="font-body-sm text-on-surface-variant">Yeni maçta skor yazılmaz. Durum oynanmadı olarak gider. Takım, stadyum ve durum adları API’ye gönderilir.</p>
+            <p class="font-body-sm text-on-surface-variant">Yeni maçta skor yazılmaz. Tarihi geçmiş maç Bitti olarak kaydolur ve anasayfada tamamlananlara düşer. İlerideki maç Oynanmadı kalır.</p>
         </div>
     </div>
 </div>
@@ -108,8 +116,11 @@
             var home = document.getElementById("homeTeam");
             var away = document.getElementById("awayTeam");
             var week = document.getElementById("leagueWeek");
+            var date = document.getElementById("matchDateTime");
+            var status = document.getElementById("matchStatus");
             var name = document.getElementById("previewMatchName");
             var sub = document.getElementById("previewMatchSub");
+            var statusTouched = false;
             function textOf(select) {
                 if (!select || !select.value) return "";
                 return select.options[select.selectedIndex].text;
@@ -120,6 +131,18 @@
                 var option = select.options[select.selectedIndex];
                 input.value = option ? (option.getAttribute("data-logo") || "") : "";
             }
+            function selectStatus(wanted) {
+                if (!status || statusTouched) return;
+                for (var i = 0; i < status.options.length; i++) {
+                    if (status.options[i].text === wanted) status.selectedIndex = i;
+                }
+            }
+            function syncStatus() {
+                if (!date || !date.value) return;
+                var when = new Date(date.value);
+                if (isNaN(when.getTime())) return;
+                selectStatus(when < new Date() ? "Bitti" : "Oynanmadı");
+            }
             function updatePreview() {
                 var h = textOf(home);
                 var a = textOf(away);
@@ -127,8 +150,10 @@
                 sub.textContent = week && week.value ? week.value + ". hafta" : "Hafta bekleniyor";
                 logoOf(home, "HomeLogoUrl");
                 logoOf(away, "AwayLogoUrl");
+                syncStatus();
             }
-            [home, away, week].forEach(function (el) { if (el) el.addEventListener("change", updatePreview); if (el) el.addEventListener("input", updatePreview); });
+            [home, away, week, date].forEach(function (el) { if (el) el.addEventListener("change", updatePreview); if (el) el.addEventListener("input", updatePreview); });
+            if (status) status.addEventListener("change", function () { statusTouched = true; });
             updatePreview();
         })();
     </script>

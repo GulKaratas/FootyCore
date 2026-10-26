@@ -11,7 +11,7 @@ namespace FootyCore.WebUI.Areas.Admin.Models
         public int TeamId { get; set; }
         public string ActionType { get; set; }
         public string Description { get; set; }
-        public int Minute { get; set; }
+        public int? Minute { get; set; }
         public List<ResultMatchDto> Matches { get; set; } = new();
         public List<ResultTeamDto> Teams { get; set; } = new();
     }

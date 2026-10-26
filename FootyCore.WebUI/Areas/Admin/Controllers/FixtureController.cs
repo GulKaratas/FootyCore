@@ -64,9 +64,7 @@ namespace FootyCore.WebUI.Areas.Admin.Controllers
         public async Task<IActionResult> Create(FixtureFormViewModel form)
         {
             var statuses = await GetStatusesAsync();
-            form.StatusName = string.IsNullOrWhiteSpace(form.StatusName)
-                ? statuses.FirstOrDefault(x => x.StatusName == "Oynanmadı")?.StatusName ?? ""
-                : form.StatusName;
+            form.StatusName = ResolveStatus(form.MatchDate, form.StatusName, statuses);
             form.HomeLogoUrl ??= "";
             form.AwayLogoUrl ??= "";
 
@@ -148,6 +146,24 @@ namespace FootyCore.WebUI.Areas.Admin.Controllers
             }
 
             return RedirectToAction("Update", new { id = dto.MatchId });
+        }
+
+        private static string ResolveStatus(DateTime? matchDate, string statusName, List<ResultMatchStatusDto> statuses)
+        {
+            var finished = statuses.FirstOrDefault(x => x.StatusName == "Bitti")?.StatusName;
+            var notPlayed = statuses.FirstOrDefault(x => x.StatusName == "Oynanmadı")?.StatusName
+                ?? statuses.FirstOrDefault()?.StatusName
+                ?? "";
+
+            if (matchDate.HasValue && matchDate.Value < DateTime.Now)
+            {
+                if (string.IsNullOrWhiteSpace(statusName) || statusName == "Oynanmadı" || statusName == "Yaklaşan")
+                {
+                    return finished ?? statusName ?? notPlayed;
+                }
+            }
+
+            return string.IsNullOrWhiteSpace(statusName) ? notPlayed : statusName;
         }
 
         private async Task<List<ResultTeamDto>> GetTeamsAsync()

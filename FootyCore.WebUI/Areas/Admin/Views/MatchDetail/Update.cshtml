@@ -43,12 +43,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                         <div class="flex flex-col gap-space-xs md:col-span-2">
                             <label class="font-label-md font-semibold" asp-for="MatchId">Müsabaka</label>
-                            <select asp-for="MatchId" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none">
+                            <select asp-for="MatchId" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none" id="matchId">
                                 @foreach (var match in Model.Matches)
                                 {
                                     var home = string.IsNullOrWhiteSpace(match.HomeTeamName) ? "Ev" : match.HomeTeamName;
                                     var away = string.IsNullOrWhiteSpace(match.AwayTeamName) ? "Deplasman" : match.AwayTeamName;
-                                    <option value="@match.MatchId">@home vs @away (@(match.Week). hafta)</option>
+                                    <option value="@match.MatchId" data-home-id="@match.HomeTeamId" data-away-id="@match.AwayTeamId" data-home="@home" data-away="@away">@home vs @away (@(match.Week). hafta)</option>
                                 }
                             </select>
                         </div>
@@ -67,12 +67,7 @@
                         </div>
                         <div class="flex flex-col gap-space-xs">
                             <label class="font-label-md font-semibold" asp-for="TeamId">Kulüp</label>
-                            <select asp-for="TeamId" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none">
-                                @foreach (var team in Model.Teams)
-                                {
-                                    <option value="@team.TeamId">@team.TeamName</option>
-                                }
-                            </select>
+                            <select asp-for="TeamId" class="w-full h-11 px-space-md rounded-lg bg-surface-container-low focus:outline-none" id="teamId" data-current="@Model.TeamId" data-current-name="@(Model.Teams.FirstOrDefault(x => x.TeamId == Model.TeamId)?.TeamName)"></select>
                         </div>
                         <div class="flex flex-col gap-space-xs">
                             <label class="font-label-md font-semibold" asp-for="Description">Açıklama</label>
@@ -103,3 +98,37 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var select = document.getElementById("matchId");
+            var team = document.getElementById("teamId");
+            function addClub(id, name) {
+                if (!team || !id || id === "0" || !name) return;
+                for (var i = 0; i < team.options.length; i++) {
+                    if (team.options[i].value === id) return;
+                }
+                var opt = document.createElement("option");
+                opt.value = id;
+                opt.textContent = name;
+                team.appendChild(opt);
+            }
+            function refresh() {
+                if (!select || !team) return;
+                var option = select.options[select.selectedIndex];
+                if (!option) return;
+                var current = team.getAttribute("data-current");
+                team.innerHTML = "";
+                addClub(option.getAttribute("data-home-id"), option.getAttribute("data-home"));
+                addClub(option.getAttribute("data-away-id"), option.getAttribute("data-away"));
+                addClub(current, team.getAttribute("data-current-name"));
+                for (var i = 0; i < team.options.length; i++) {
+                    if (team.options[i].value === current) team.selectedIndex = i;
+                }
+            }
+            if (select) select.addEventListener("change", refresh);
+            refresh();
+        })();
+    </script>
+}

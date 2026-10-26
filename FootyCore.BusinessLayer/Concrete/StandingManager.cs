@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using FootyCore.BusinessLayer.Abstract;
 using FootyCore.DataAccessLayer.Abstract;
 using FootyCore.DtoLayer.StandingDto;
@@ -37,7 +37,8 @@ public class StandingManager : IStandingService
                     ? t.TeamName.Substring(0, 3).ToUpper()
                     : t.TeamName.ToUpper(),
                 LogoUrl = t.LogoUrl,
-                Zone = "none"
+                Zone = "none",
+                Form = new List<string>()
             });
 
         foreach (var match in matches)

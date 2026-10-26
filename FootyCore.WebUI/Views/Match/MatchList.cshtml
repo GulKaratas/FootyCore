@@ -6,7 +6,7 @@
     var matches = Model.Matches ?? new List<ResultMatchDto>();
     var liveMatches = matches.Where(x => x.StatusName != null && x.StatusName.Contains("Canlı")).ToList();
     var finishedMatches = matches.Where(x => x.StatusName != null && x.StatusName.Contains("Bitti")).ToList();
-    var upcomingMatches = matches.Where(x => x.StatusName != null && x.StatusName.Contains("Oynanmadı")).ToList();
+    var upcomingMatches = matches.Where(x => x.StatusName != null && (x.StatusName.Contains("Oynanmadı") || x.StatusName.Contains("Yaklaşan"))).ToList();
     var featured = Model.FeaturedMatch ?? matches.FirstOrDefault();
 }
 

@@ -13,11 +13,11 @@
     var subs = Model.Substitutions ?? new List<ResultMatchDetailDto>();
 
     var homeGoals = goals.Where(x => match != null && x.TeamId == match.HomeTeamId).ToList();
-    var awayGoals = goals.Where(x => match != null && x.TeamId == match.AwayTeamId).ToList();
+    var awayGoals = goals.Where(x => match != null && x.TeamId != match.HomeTeamId).ToList();
     var homeCards = cards.Where(x => match != null && x.TeamId == match.HomeTeamId).ToList();
-    var awayCards = cards.Where(x => match != null && x.TeamId == match.AwayTeamId).ToList();
+    var awayCards = cards.Where(x => match != null && x.TeamId != match.HomeTeamId).ToList();
     var homeSubs = subs.Where(x => match != null && x.TeamId == match.HomeTeamId).ToList();
-    var awaySubs = subs.Where(x => match != null && x.TeamId == match.AwayTeamId).ToList();
+    var awaySubs = subs.Where(x => match != null && x.TeamId != match.HomeTeamId).ToList();
 
     string Pair(int? home, int? away) => home.HasValue && away.HasValue ? $"{home}–{away}" : "—";
     int Share(int home, int away)

@@ -111,14 +111,25 @@
                     {
                         var category = item.ActionType == "Gol" ? "goal" : item.ActionType == "Değişiklik" ? "substitution" : "card";
                         var club = string.IsNullOrWhiteSpace(item.TeamName) ? "Kulüp #" + item.TeamId : item.TeamName;
+                        var typeStyle = item.ActionType == "Gol"
+                            ? "background:#e5f6ea;color:#146c43;border:1px solid #8dceb0;"
+                            : item.ActionType == "Sarı Kart"
+                                ? "background:#fff4d6;color:#8a5a00;border:1px solid #e6c36a;"
+                                : item.ActionType == "Kırmızı Kart"
+                                    ? "background:#fde8ea;color:#9f1239;border:1px solid #f3a8b5;"
+                                    : "background:#ffdfa0;color:#5a192c;border:1px solid #e2c27a;";
                         <tr class="hover:bg-surface-container-low/50" data-category="@category">
                             <td class="py-space-md px-space-lg font-headline-sm text-primary font-bold">@(item.Minute)'</td>
-                            <td class="py-space-md px-space-md font-semibold">@item.ActionType</td>
+                            <td class="py-space-md px-space-md">
+                                <span class="inline-flex items-center px-space-sm py-1 rounded-lg font-label-md font-bold shadow-sm" style="@typeStyle">@item.ActionType</span>
+                            </td>
                             <td class="py-space-md px-space-md font-semibold">@club</td>
                             <td class="py-space-md px-space-md">@item.Description</td>
                             <td class="py-space-md px-space-lg text-right">
-                                <a class="inline-flex h-8 w-8 rounded-lg text-on-surface-variant hover:text-primary items-center justify-center" title="Düzenle" href="/Admin/MatchDetail/Update/@item.MatchDetailId"><span class="material-symbols-outlined text-base">edit</span></a>
-                                <a class="inline-flex h-8 w-8 rounded-lg text-on-surface-variant hover:text-error items-center justify-center" title="Sil" href="/Admin/MatchDetail/Delete/@item.MatchDetailId" data-confirm-delete="Bu olay silinsin mi?"><span class="material-symbols-outlined text-base">delete</span></a>
+                                <div class="inline-flex items-center justify-end gap-space-xs">
+                                    <a href="/Admin/MatchDetail/Update/@item.MatchDetailId" class="inline-flex items-center gap-1 px-space-md py-1 rounded-lg font-label-md font-semibold shadow-sm" style="background:#762f42;color:#fff;border:1px solid #5a192c;">Düzenle</a>
+                                    <a href="/Admin/MatchDetail/Delete/@item.MatchDetailId" class="inline-flex items-center gap-1 px-space-md py-1 rounded-lg font-label-md font-semibold shadow-sm" style="background:#fde8ea;color:#9f1239;border:1px solid #e7a8b2;" data-confirm-delete="Bu olay silinsin mi?">Sil</a>
+                                </div>
                             </td>
                         </tr>
                     }

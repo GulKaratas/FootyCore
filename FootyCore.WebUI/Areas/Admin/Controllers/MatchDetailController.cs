@@ -50,10 +50,6 @@ namespace FootyCore.WebUI.Areas.Admin.Controllers
             var teams = await GetTeamsAsync();
             return View(new MatchEventFormViewModel
             {
-                Minute = 1,
-                ActionType = "Gol",
-                TeamId = teams.FirstOrDefault()?.TeamId ?? 0,
-                MatchId = matches.FirstOrDefault()?.MatchId ?? 0,
                 Matches = matches,
                 Teams = teams
             });

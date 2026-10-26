@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +22,6 @@ namespace FootyCore.DtoLayer.StandingDto
         public int GoalDifference { get; set; }
         public int Points { get; set; }
         public string Zone { get; set; }
-        public List<string> Form { get; set; }
+        public List<string> Form { get; set; } = new();
     }
 }
