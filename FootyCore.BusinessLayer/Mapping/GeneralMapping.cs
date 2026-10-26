@@ -2,7 +2,10 @@ using AutoMapper;
 using FootyCore.DtoLayer.MatchDetailDto;
 using FootyCore.DtoLayer.MatchDto;
 using FootyCore.DtoLayer.MatchStatisticDto;
+using FootyCore.DtoLayer.MatchStatusDto;
 using FootyCore.DtoLayer.SeasonDto;
+using FootyCore.DtoLayer.StadiumDto;
+using FootyCore.DtoLayer.TeamDto;
 using FootyCore.EntityLayer.Entities;
 
 namespace FootyCore.BusinessLayer.Mapping
@@ -12,6 +15,9 @@ namespace FootyCore.BusinessLayer.Mapping
         public GeneralMapping()
         {
             CreateMap<Season, ResultSeasonDto>();
+            CreateMap<Team, ResultTeamDto>();
+            CreateMap<MatchStatus, ResultMatchStatusDto>();
+            CreateMap<Stadium, ResultStadiumDto>();
 
             CreateMap<Match, ResultMatchDto>()
                 .ForMember(dest => dest.HomeTeamName,
@@ -37,10 +43,20 @@ namespace FootyCore.BusinessLayer.Mapping
                 .ForMember(dest => dest.City,
                     opt => opt.MapFrom(src => src.Stadium == null
                         ? string.Empty
-                        : src.Stadium.City));
+                        : src.Stadium.City))
+                .ForMember(dest => dest.Statistic,
+                    opt => opt.MapFrom(src => src.MatchStatistic));
 
-            CreateMap<MatchDetail, ResultMatchDetailDto>();
+            CreateMap<MatchDetail, ResultMatchDetailDto>()
+                .ForMember(dest => dest.TeamName,
+                    opt => opt.MapFrom(src => src.Team == null ? string.Empty : src.Team.TeamName));
+            CreateMap<MatchDetail, GetMatchDetailByIdDto>();
+            CreateMap<CreateMatchDetailDto, MatchDetail>();
+            CreateMap<UpdateMatchDetailDto, MatchDetail>();
             CreateMap<MatchStatistic, ResultMatchStatisticDto>();
+            CreateMap<MatchStatistic, GetMatchStatisticByIdDto>();
+            CreateMap<CreateMatchStatisticDto, MatchStatistic>();
+            CreateMap<UpdateMatchStatisticDto, MatchStatistic>();
         }
     }
 }

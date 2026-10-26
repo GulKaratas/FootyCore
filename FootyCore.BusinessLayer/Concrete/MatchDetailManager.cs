@@ -28,29 +28,33 @@ namespace FootyCore.BusinessLayer.Concrete
             return _mapper.Map<List<ResultMatchDetailDto>>(values);
         }
 
-        public Task TDelete(int id)
+        public async Task TDelete(int id)
         {
-            throw new NotImplementedException();
+            await _matchDetailDal.Delete(id);
         }
 
-        public Task<GetMatchDetailByIdDto> TGetById(int id)
+        public async Task<GetMatchDetailByIdDto> TGetById(int id)
         {
-            throw new NotImplementedException();
+            var value = await _matchDetailDal.GetById(id);
+            return _mapper.Map<GetMatchDetailByIdDto>(value);
         }
 
-        public Task<List<ResultMatchDetailDto>> TGetList()
+        public async Task<List<ResultMatchDetailDto>> TGetList()
         {
-            throw new NotImplementedException();
+            var values = await _matchDetailDal.GetAllWithTeamAsync();
+            return _mapper.Map<List<ResultMatchDetailDto>>(values);
         }
 
-        public Task TInsert(CreateMatchDetailDto dto)
+        public async Task TInsert(CreateMatchDetailDto dto)
         {
-            throw new NotImplementedException();
+            var value = _mapper.Map<MatchDetail>(dto);
+            await _matchDetailDal.Insert(value);
         }
 
-        public Task TUpdate(UpdateMatchDetailDto dto)
+        public async Task TUpdate(UpdateMatchDetailDto dto)
         {
-            throw new NotImplementedException();
+            var value = _mapper.Map<MatchDetail>(dto);
+            await _matchDetailDal.Update(value);
         }
     }
 }

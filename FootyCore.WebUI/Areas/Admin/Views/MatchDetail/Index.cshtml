@@ -1,268 +1,187 @@
-﻿@{
-    ViewData["Title"] = "Index";
+@model MatchEventPageViewModel
+@{
+    ViewData["Title"] = "Maç Olayları";
     Layout = "~/Areas/Admin/Views/Admin/_IndexLayout.cshtml";
+    var events = Model.Events ?? new List<ResultMatchDetailDto>();
+    var featured = Model.Featured;
+    var featuredEvents = featured == null ? new List<ResultMatchDetailDto>() : events.Where(x => x.MatchId == featured.MatchId).ToList();
+    var goals = featuredEvents.Where(x => x.ActionType == "Gol").OrderBy(x => x.Minute).ToList();
+    var goalCount = events.Count(x => x.ActionType == "Gol");
+    var yellowCount = events.Count(x => x.ActionType == "Sarı Kart");
+    var redCount = events.Count(x => x.ActionType == "Kırmızı Kart");
+    var subCount = events.Count(x => x.ActionType == "Değişiklik");
+    var home = featured == null || string.IsNullOrWhiteSpace(featured.HomeTeamName) ? "Ev sahibi" : featured.HomeTeamName;
+    var away = featured == null || string.IsNullOrWhiteSpace(featured.AwayTeamName) ? "Deplasman" : featured.AwayTeamName;
+    var hasScore = featured != null && featured.HomeScore.HasValue && featured.AwayScore.HasValue;
+    var homePoss = featured?.Statistic?.HomePossession ?? 0;
+    var awayPoss = featured?.Statistic?.AwayPossession ?? 0;
 }
 
-<!-- Main Content -->
-<div class="main-content">
-<header class="top-bar">
-<div class="d-flex align-items-center gap-3">
-<button aria-label="Menüyü Aç/Kapa" class="menu-toggle-btn" id="menuToggle">
-<i class="bi bi-list"></i>
-</button>
-<div class="top-bar-title">
-<h2 class="">Maç Olayı</h2>
-<p class="">Gol, kart veya oyuncu değişikliği ekle.</p>
-</div>
-</div>
-<div>
-<div class="admin-pill">
-<span class="status-dot"></span>
-<span class="">Admin</span>
-</div>
-</div>
-</header>
-<div class="content-container">
-<!-- Olay Ekleme Form Kartı -->
-<div class="fc-card">
-<div class="fc-card-title">
-<i class="bi bi-plus-circle" style="color: var(--primary-coral);"></i>
-<span class="">Olay Bilgileri</span>
-</div>
-<form id="eventForm">
-<div class="row g-3">
-<!-- Maç Seçimi -->
-<div class="col-md-6">
-<label class="form-label" for="matchSelect">Maç</label>
-<select class="form-select" id="matchSelect" required="">
-<option data-away="Fenerbahçe" data-home="Galatasaray" selected="" value="1">Hafta 26: Galatasaray vs Fenerbahçe (29.03.2025)</option>
-<option data-away="Chelsea" data-home="Arsenal" value="2">Hafta 26: Arsenal vs Chelsea (30.03.2025)</option>
-</select>
-</div>
-<!-- Takım Seçimi -->
-<div class="col-md-6">
-<label class="form-label" for="teamSelect">Takım</label>
-<select class="form-select" id="teamSelect" required="">
-<option selected="" value="Galatasaray">Galatasaray</option>
-<option value="Fenerbahçe">Fenerbahçe</option>
-</select>
-</div>
-<!-- Olay Türü -->
-<div class="col-md-6">
-<label class="form-label" for="eventType">Olay Türü</label>
-<select class="form-select" id="eventType" required="">
-<option selected="" value="Gol">Gol</option>
-<option value="Sarı Kart">Sarı Kart</option>
-<option value="Kırmızı Kart">Kırmızı Kart</option>
-<option value="Değişiklik">Değişiklik</option>
-</select>
-</div>
-<!-- Dakika (1-120) -->
-<div class="col-md-6">
-<label class="form-label" for="eventMinute">Dakika (1–120)</label>
-<input class="form-control" id="eventMinute" max="120" min="1" required="" type="number" value="38">
-</div>
-<!-- Oyuncu Adı (Gol, Sarı Kart, Kırmızı Kart için) -->
-<div class="col-12" id="singlePlayerContainer">
-<label class="form-label" for="playerName">Oyuncu Adı</label>
-<input class="form-control" id="playerName" placeholder="Örn: Mauro Icardi" type="text" value="Mauro Icardi">
-</div>
-<!-- Değişiklik Seçildiğinde Ayrılan İki Alan (Giren / Çıkan) -->
-<div class="col-md-6" id="playerInContainer" style="display: none;">
-<label class="form-label" for="playerIn">Giren Oyuncu</label>
-<input class="form-control" id="playerIn" placeholder="Örn: Barış Alper Yılmaz" type="text">
-</div>
-<div class="col-md-6" id="playerOutContainer" style="display: none;">
-<label class="form-label" for="playerOut">Çıkan Oyuncu</label>
-<input class="form-control" id="playerOut" placeholder="Örn: Hakim Ziyech" type="text">
-</div>
-<!-- Form Kaydet Butonu -->
-<div class="col-12 mt-4 pt-2 border-top d-flex justify-content-end" style="border-color: var(--border-color) !important;">
-<button class="btn-coral" type="submit">
-<i class="bi bi-check-lg"></i> Olayı Kaydet
-              </button>
-</div>
-</div>
-</form>
-</div>
-<!-- Seçili Maçın Olay Tablosu -->
-<div class="fc-card">
-<div class="d-flex align-items-center justify-content-between mb-3">
-<div class="fc-card-title mb-0" id="tableHeaderTitle">
-<i class="bi bi-card-list" style="color: var(--secondary-teal);"></i>
-<span class="">Maç Olayları: Galatasaray vs Fenerbahçe</span>
-</div>
-</div>
-<div class="table-responsive">
-<table class="table fc-table" id="eventsTable">
-<thead>
-<tr><th style="width: 12%;" class="">DAKİKA</th><th style="width: 24%;" class="">TAKIM</th><th style="width: 22%;" class="">TÜR</th><th style="width: 28%;" class="">AÇIKLAMA</th><th class="text-end" style="width: 14%;">İŞLEMLER</th></tr>
-</thead>
-<tbody id="eventsTableBody">
-<tr>
-<td class=""><span class="minute-pill">24'</span></td>
-<td class="fw-semibold">Galatasaray</td>
-<td class="">
-<span class="badge-event-goal"><i class="bi bi-futbol"></i> Gol</span>
-</td>
-<td class="">Mauro Icardi</td>
-<td class="text-end"><div class="d-inline-flex gap-2"><button aria-label="Düzenle" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Düzenle" type="button"><i class="bi bi-pencil"></i></button><button aria-label="Sil" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Sil" type="button"><i class="bi bi-trash3"></i></button></div></td></tr>
-<tr>
-<td class=""><span class="minute-pill">39'</span></td>
-<td class="fw-semibold">Fenerbahçe</td>
-<td class="">
-<span class="badge-event-yellow"><span class="card-icon-sq card-icon-yellow"></span> Sarı Kart</span>
-</td>
-<td class="">Alexander Djiku</td>
-<td class="text-end"><div class="d-inline-flex gap-2"><button aria-label="Düzenle" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Düzenle" type="button"><i class="bi bi-pencil"></i></button><button aria-label="Sil" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Sil" type="button"><i class="bi bi-trash3"></i></button></div></td></tr>
-<tr>
-<td class=""><span class="minute-pill">65'</span></td>
-<td class="fw-semibold">Galatasaray</td>
-<td class="">
-<span class="badge-event-sub"><i class="bi bi-arrow-left-right"></i> Değişiklik</span>
-</td>
-<td class="">Barış Alper Yılmaz / Hakim Ziyech</td>
-<td class="text-end"><div class="d-inline-flex gap-2"><button aria-label="Düzenle" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Düzenle" type="button"><i class="bi bi-pencil"></i></button><button aria-label="Sil" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Sil" type="button"><i class="bi bi-trash3"></i></button></div></td></tr>
-<tr>
-<td class=""><span class="minute-pill">78'</span></td>
-<td class="fw-semibold">Fenerbahçe</td>
-<td class="">
-<span class="badge-event-red"><span class="card-icon-sq card-icon-red"></span> Kırmızı Kart</span>
-</td>
-<td class="">Fred</td>
-<td class="text-end"><div class="d-inline-flex gap-2"><button aria-label="Düzenle" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Düzenle" type="button"><i class="bi bi-pencil"></i></button><button aria-label="Sil" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center p-1 rounded-2" style="width: 32px; height: 32px;" title="Sil" type="button"><i class="bi bi-trash3"></i></button></div></td></tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
+<div class="flex flex-col w-full gap-space-lg">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+        <div class="flex flex-col gap-space-xs">
+            <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Maç Olay Akışı</h1>
+            <p class="font-body-md text-on-surface-variant">Gol, sarı kart, kırmızı kart ve oyuncu değişikliği.</p>
+        </div>
+        <a href="/Admin/MatchDetail/Create" class="inline-flex items-center gap-space-xs px-space-lg py-space-sm rounded-lg bg-primary-container text-on-primary font-title-md shadow-md hover:bg-primary self-start">
+            <span class="material-symbols-outlined">add_circle</span>
+            <span>Yeni Olay Ekle</span>
+        </a>
+    </div>
+
+    <div class="relative overflow-hidden rounded-xl bg-surface-container-lowest shadow-md p-space-xl">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-space-lg">
+                <div class="flex items-center gap-space-md">
+                    <div class="flex flex-col items-center">
+                        <span class="font-headline-md text-headline-md text-on-surface font-semibold">@home</span>
+                        <span class="font-label-sm text-on-surface-variant tracking-wider uppercase">Ev sahibi</span>
+                    </div>
+                    <div class="px-space-lg py-space-xs rounded-xl bg-surface-container text-primary font-headline-lg font-bold">@(hasScore ? $"{featured.HomeScore} - {featured.AwayScore}" : "—")</div>
+                    <div class="flex flex-col items-center">
+                        <span class="font-headline-md text-headline-md text-on-surface font-semibold">@away</span>
+                        <span class="font-label-sm text-on-surface-variant tracking-wider uppercase">Deplasman</span>
+                    </div>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <div class="flex items-center gap-space-xs flex-wrap">
+                        <span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-surface-container text-primary font-label-sm font-bold uppercase">
+                            @(featured?.StatusName ?? "Maç yok")
+                        </span>
+                        <span class="font-label-md text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-base text-secondary">stadium</span>
+                            @(featured?.StadiumName ?? "")
+                        </span>
+                    </div>
+                    <div class="font-label-sm text-secondary mt-1 font-semibold uppercase tracking-wider">@(featured?.Week ?? 0). Hafta</div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-space-xs bg-surface-container-low p-space-md rounded-xl max-w-xl">
+                <div class="flex items-center justify-between text-on-surface-variant font-label-sm uppercase font-semibold">
+                    <span>Goller</span>
+                    <span class="text-secondary">Top: %@homePoss - %@awayPoss</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-space-sm pt-space-xs">
+                    @if (goals.Count == 0)
+                    {
+                        <span class="font-body-sm text-on-surface-variant">Bu maçta gol kaydı yok.</span>
+                    }
+                    @foreach (var goal in goals)
+                    {
+                        <span class="inline-flex items-center gap-1.5 px-space-sm py-1 rounded-lg bg-surface-container-lowest text-body-sm shadow-sm"><span class="font-semibold text-primary">@(goal.Minute)'</span> @goal.Description</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+        <div class="flex items-center gap-space-xs overflow-x-auto" id="filterTabs">
+            <button type="button" class="px-space-md py-space-xs rounded-lg bg-primary-container text-on-primary font-label-lg font-semibold shadow-sm" data-type="all">Tümü</button>
+            <button type="button" class="px-space-md py-space-xs rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-lg shadow-sm" data-type="goal">Goller</button>
+            <button type="button" class="px-space-md py-space-xs rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-lg shadow-sm" data-type="card">Kartlar</button>
+            <button type="button" class="px-space-md py-space-xs rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-lg shadow-sm" data-type="substitution">Değişiklikler</button>
+        </div>
+        <div class="relative w-full lg:w-72">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant">search</span>
+            <input class="w-full h-10 pl-10 pr-4 rounded-lg bg-surface-container-lowest shadow-sm focus:outline-none" id="searchInput" placeholder="Oyuncu veya kulüp ara" type="text" />
+        </div>
+    </div>
+
+    <div class="rounded-xl bg-surface-container-lowest shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left" id="eventTable">
+                <thead>
+                    <tr class="bg-surface-container-low text-on-surface-variant font-label-sm uppercase tracking-wider">
+                        <th class="py-space-md px-space-lg">Dakika</th>
+                        <th class="py-space-md px-space-md">Olay türü</th>
+                        <th class="py-space-md px-space-md">Kulüp</th>
+                        <th class="py-space-md px-space-md">Açıklama</th>
+                        <th class="py-space-md px-space-lg text-right">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-container-high text-on-surface">
+                    @if (events.Count == 0)
+                    {
+                        <tr>
+                            <td class="py-space-lg px-space-lg text-on-surface-variant" colspan="5">Kayıtlı maç olayı yok.</td>
+                        </tr>
+                    }
+                    @foreach (var item in events)
+                    {
+                        var category = item.ActionType == "Gol" ? "goal" : item.ActionType == "Değişiklik" ? "substitution" : "card";
+                        var club = string.IsNullOrWhiteSpace(item.TeamName) ? "Kulüp #" + item.TeamId : item.TeamName;
+                        <tr class="hover:bg-surface-container-low/50" data-category="@category">
+                            <td class="py-space-md px-space-lg font-headline-sm text-primary font-bold">@(item.Minute)'</td>
+                            <td class="py-space-md px-space-md font-semibold">@item.ActionType</td>
+                            <td class="py-space-md px-space-md font-semibold">@club</td>
+                            <td class="py-space-md px-space-md">@item.Description</td>
+                            <td class="py-space-md px-space-lg text-right">
+                                <a class="inline-flex h-8 w-8 rounded-lg text-on-surface-variant hover:text-primary items-center justify-center" title="Düzenle" href="/Admin/MatchDetail/Update/@item.MatchDetailId"><span class="material-symbols-outlined text-base">edit</span></a>
+                                <a class="inline-flex h-8 w-8 rounded-lg text-on-surface-variant hover:text-error items-center justify-center" title="Sil" href="/Admin/MatchDetail/Delete/@item.MatchDetailId" data-confirm-delete="Bu olay silinsin mi?"><span class="material-symbols-outlined text-base">delete</span></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-space-md">
+        <div class="flex flex-col items-center justify-center p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+            <span class="material-symbols-outlined text-emerald-700 text-headline-md">sports_soccer</span>
+            <span class="font-headline-lg text-headline-lg font-bold">@goalCount</span>
+            <span class="font-label-sm uppercase text-on-surface-variant">Gol</span>
+        </div>
+        <div class="flex flex-col items-center justify-center p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+            <span class="w-4 h-6 bg-amber-500 rounded-sm inline-block"></span>
+            <span class="font-headline-lg text-headline-lg font-bold">@yellowCount</span>
+            <span class="font-label-sm uppercase text-on-surface-variant">Sarı kart</span>
+        </div>
+        <div class="flex flex-col items-center justify-center p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+            <span class="w-4 h-6 bg-rose-600 rounded-sm inline-block"></span>
+            <span class="font-headline-lg text-headline-lg font-bold">@redCount</span>
+            <span class="font-label-sm uppercase text-on-surface-variant">Kırmızı kart</span>
+        </div>
+        <div class="flex flex-col items-center justify-center p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+            <span class="material-symbols-outlined text-secondary text-headline-md">sync_alt</span>
+            <span class="font-headline-lg text-headline-lg font-bold">@subCount</span>
+            <span class="font-label-sm uppercase text-on-surface-variant">Değişiklik</span>
+        </div>
+    </div>
 </div>
 
-<script>
-  // Mobile sidebar toggle
-  const menuToggle = document.getElementById('menuToggle');
-  const sidebar = document.getElementById('sidebar');
-  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+@section Scripts {
+    <script>
+        (function () {
+            var tabs = document.querySelectorAll("#filterTabs button");
+            var rows = document.querySelectorAll("#eventTable tbody tr");
+            var searchInput = document.getElementById("searchInput");
+            var current = "all";
 
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    sidebarBackdrop.classList.toggle('active');
-  });
+            function apply() {
+                var val = searchInput ? searchInput.value.toLowerCase().trim() : "";
+                rows.forEach(function (row) {
+                    var cat = row.getAttribute("data-category") || "";
+                    var text = row.innerText.toLowerCase();
+                    var catOk = current === "all" || cat.indexOf(current) >= 0;
+                    row.style.display = catOk && text.indexOf(val) >= 0 ? "" : "none";
+                });
+            }
 
-  sidebarBackdrop.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    sidebarBackdrop.classList.remove('active');
-  });
-
-  // Dinamik Form Değişimi: Değişiklik seçildiğinde Giren/Çıkan ayrımı
-  const eventType = document.getElementById('eventType');
-  const singlePlayerContainer = document.getElementById('singlePlayerContainer');
-  const playerInContainer = document.getElementById('playerInContainer');
-  const playerOutContainer = document.getElementById('playerOutContainer');
-  const playerNameInput = document.getElementById('playerName');
-  const playerInInput = document.getElementById('playerIn');
-  const playerOutInput = document.getElementById('playerOut');
-
-  eventType.addEventListener('change', () => {
-    if (eventType.value === 'Değişiklik') {
-      singlePlayerContainer.style.display = 'none';
-      playerNameInput.required = false;
-
-      playerInContainer.style.display = 'block';
-      playerOutContainer.style.display = 'block';
-      playerInInput.required = true;
-      playerOutInput.required = true;
-    } else {
-      singlePlayerContainer.style.display = 'block';
-      playerNameInput.required = true;
-
-      playerInContainer.style.display = 'none';
-      playerOutContainer.style.display = 'none';
-      playerInInput.required = false;
-      playerOutInput.required = false;
-    }
-  });
-
-  // Maç seçimine göre takım seçeneklerini ve tablo başlığını güncelleme
-  const matchSelect = document.getElementById('matchSelect');
-  const teamSelect = document.getElementById('teamSelect');
-  const tableHeaderTitle = document.getElementById('tableHeaderTitle');
-
-  matchSelect.addEventListener('change', () => {
-    const selectedOption = matchSelect.options[matchSelect.selectedIndex];
-    const home = selectedOption.getAttribute('data-home');
-    const away = selectedOption.getAttribute('data-away');
-
-    teamSelect.innerHTML = `
-      <option value="${home}" selected>${home}</option>
-      <option value="${away}">${away}</option>
-    `;
-
-    tableHeaderTitle.innerHTML = `
-      <i class="bi bi-card-list" style="color: var(--secondary-teal);"></i>
-      <span>Maç Olayları: ${home} vs ${away}</span>
-    `;
-  });
-
-  // Rozet HTML oluşturucu
-  function getBadgeHtml(type) {
-    if (type === 'Gol') {
-      return `<span class="badge-event-goal"><i class="bi bi-futbol"></i> Gol</span>`;
-    } else if (type === 'Sarı Kart') {
-      return `<span class="badge-event-yellow"><span class="card-icon-sq card-icon-yellow"></span> Sarı Kart</span>`;
-    } else if (type === 'Kırmızı Kart') {
-      return `<span class="badge-event-red"><span class="card-icon-sq card-icon-red"></span> Kırmızı Kart</span>`;
-    } else if (type === 'Değişiklik') {
-      return `<span class="badge-event-sub"><i class="bi bi-arrow-left-right"></i> Değişiklik</span>`;
-    }
-    return type;
-  }
-
-  // Form submit, tabloya ekleme & Toast
-  const eventForm = document.getElementById('eventForm');
-  const successToast = document.getElementById('successToast');
-  const eventsTableBody = document.getElementById('eventsTableBody');
-  const eventMinuteInput = document.getElementById('eventMinute');
-
-  eventForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const minuteVal = eventMinuteInput.value;
-    const teamVal = teamSelect.value;
-    const typeVal = eventType.value;
-    let descVal = '';
-
-    if (typeVal === 'Değişiklik') {
-      const giren = playerInInput.value.trim();
-      const cikan = playerOutInput.value.trim();
-      descVal = `${giren} / ${cikan}`;
-    } else {
-      descVal = playerNameInput.value.trim();
-    }
-
-    // Yeni satır oluştur ve tabloya ekle
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="minute-pill">${minuteVal}'</span></td>
-      <td class="fw-semibold">${teamVal}</td>
-      <td>${getBadgeHtml(typeVal)}</td>
-      <td>${descVal}</td>
-    `;
-    eventsTableBody.appendChild(tr);
-
-    // Toast göster
-    successToast.style.display = 'block';
-    setTimeout(() => {
-      successToast.style.display = 'none';
-    }, 3200);
-
-    // Formu temizle veya sıfırla
-    if (typeVal === 'Değişiklik') {
-      playerInInput.value = '';
-      playerOutInput.value = '';
-    } else {
-      playerNameInput.value = '';
-    }
-  });
-</script>
+            tabs.forEach(function (tab) {
+                tab.addEventListener("click", function () {
+                    current = tab.getAttribute("data-type");
+                    tabs.forEach(function (t) {
+                        t.classList.remove("bg-primary-container", "text-on-primary", "font-semibold");
+                        t.classList.add("bg-surface-container-lowest", "text-on-surface-variant");
+                    });
+                    tab.classList.add("bg-primary-container", "text-on-primary", "font-semibold");
+                    tab.classList.remove("bg-surface-container-lowest", "text-on-surface-variant");
+                    apply();
+                });
+            });
+            if (searchInput) searchInput.addEventListener("input", apply);
+        })();
+    </script>
+}

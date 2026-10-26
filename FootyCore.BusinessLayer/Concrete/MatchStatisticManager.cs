@@ -1,39 +1,49 @@
-﻿using FootyCore.BusinessLayer.Abstract;
+using AutoMapper;
+using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DataAccessLayer.Abstract;
 using FootyCore.DtoLayer.MatchStatisticDto;
 using FootyCore.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FootyCore.BusinessLayer.Concrete
 {
     public class MatchStatisticManager : IMatchStatisticService
     {
-        public Task TDelete(int id)
+        private readonly IMatchStatisticDal _matchStatisticDal;
+        private readonly IMapper _mapper;
+
+        public MatchStatisticManager(IMatchStatisticDal matchStatisticDal, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _matchStatisticDal = matchStatisticDal;
+            _mapper = mapper;
         }
 
-        public Task<GetMatchStatisticByIdDto> TGetById(int id)
+        public async Task TDelete(int id)
         {
-            throw new NotImplementedException();
+            await _matchStatisticDal.Delete(id);
         }
 
-        public Task<List<ResultMatchStatisticDto>> TGetList()
+        public async Task<GetMatchStatisticByIdDto> TGetById(int id)
         {
-            throw new NotImplementedException();
+            var value = await _matchStatisticDal.GetById(id);
+            return _mapper.Map<GetMatchStatisticByIdDto>(value);
         }
 
-        public Task TInsert(CreateMatchStatisticDto dto)
+        public async Task<List<ResultMatchStatisticDto>> TGetList()
         {
-            throw new NotImplementedException();
+            var value = await _matchStatisticDal.GetList();
+            return _mapper.Map<List<ResultMatchStatisticDto>>(value);
         }
 
-        public Task TUpdate(UpdateMatchStatisticDto dto)
+        public async Task TInsert(CreateMatchStatisticDto dto)
         {
-            throw new NotImplementedException();
+            var value = _mapper.Map<MatchStatistic>(dto);
+            await _matchStatisticDal.Insert(value);
+        }
+
+        public async Task TUpdate(UpdateMatchStatisticDto dto)
+        {
+            var value = _mapper.Map<MatchStatistic>(dto);
+            await _matchStatisticDal.Update(value);
         }
     }
 }

@@ -1,0 +1,135 @@
+@model FixtureFormViewModel
+@{
+    ViewData["Title"] = "Yeni Maç Ekle";
+    Layout = "~/Areas/Admin/Views/Admin/_IndexLayout.cshtml";
+}
+
+<div class="flex flex-col w-full">
+    <nav class="flex items-center gap-space-xs font-label-md text-on-surface-variant mb-space-md">
+        <a class="hover:text-primary flex items-center gap-1" href="/Admin/Fixture">
+            <span class="material-symbols-outlined text-[15px] text-secondary">calendar_month</span>
+            <span>Fikstür</span>
+        </a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="text-primary font-semibold">Yeni Maç Ekle</span>
+    </nav>
+
+    <div class="mb-space-xl">
+        <div class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container mb-space-xs">
+            <span class="material-symbols-outlined text-[14px] text-secondary">shield</span>
+            <span class="font-label-sm uppercase font-semibold">Resmi lig operasyonu</span>
+        </div>
+        <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Yeni Fikstür Kaydı</h1>
+        <p class="font-body-md text-on-surface-variant mt-1">Hafta, takımlar, tarih ve stadyum.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+        <div class="lg:col-span-8">
+            <div class="bg-surface-container-lowest rounded-xl shadow-md p-space-xl">
+                <div class="flex items-center justify-between pb-space-lg mb-space-lg">
+                    <div>
+                        <h2 class="font-headline-sm text-headline-sm text-on-surface">Müsabaka detayları</h2>
+                        <p class="font-body-md text-on-surface-variant">Skor bu kayıtta boş kalır.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1 px-space-md py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm font-semibold uppercase">Taslak</span>
+                </div>
+
+                <form method="post" class="flex flex-col gap-space-xl" id="fixtureForm">
+                    <input type="hidden" asp-for="StatusName" />
+                    <input type="hidden" asp-for="HomeLogoUrl" />
+                    <input type="hidden" asp-for="AwayLogoUrl" />
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-lg">
+                        <div class="flex flex-col gap-space-xs">
+                            <label class="font-label-lg text-tertiary font-semibold" for="homeTeam">Ev sahibi takım</label>
+                            <select asp-for="HomeTeamName" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="homeTeam">
+                                <option value="">Ev sahibi kulübü seçin</option>
+                                @foreach (var team in Model.Teams)
+                                {
+                                    <option value="@team.TeamName" data-logo="@team.LogoUrl">@team.TeamName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-space-xs">
+                            <label class="font-label-lg text-tertiary font-semibold" for="awayTeam">Deplasman takımı</label>
+                            <select asp-for="AwayTeamName" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="awayTeam">
+                                <option value="">Deplasman kulübünü seçin</option>
+                                @foreach (var team in Model.Teams)
+                                {
+                                    <option value="@team.TeamName" data-logo="@team.LogoUrl">@team.TeamName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-space-xs">
+                            <label class="font-label-lg text-tertiary font-semibold" asp-for="MatchDate">Maç tarihi ve saati</label>
+                            <input asp-for="MatchDate" type="datetime-local" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="matchDateTime" />
+                        </div>
+                        <div class="flex flex-col gap-space-xs">
+                            <label class="font-label-lg text-tertiary font-semibold" asp-for="Week">Lig haftası</label>
+                            <input asp-for="Week" type="number" min="1" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="leagueWeek" />
+                        </div>
+                        <div class="flex flex-col gap-space-xs md:col-span-2">
+                            <label class="font-label-lg text-tertiary font-semibold" asp-for="StadiumName">Stadyum</label>
+                            <select asp-for="StadiumName" class="w-full h-11 px-3 bg-surface-container-low rounded-lg focus:outline-none" id="stadium">
+                                <option value="">Stadyum seçin</option>
+                                @foreach (var stadium in Model.Stadiums)
+                                {
+                                    <option value="@stadium.StadiumName">@stadium.StadiumName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="p-space-lg bg-surface-container-low rounded-xl">
+                        <span class="font-title-md font-semibold" id="previewMatchName">Takım seçilmedi</span>
+                        <span class="block font-body-sm text-on-surface-variant" id="previewMatchSub">Hafta bekleniyor</span>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-space-md">
+                        <a href="/Admin/Fixture" class="px-space-lg py-2.5 rounded-lg bg-surface-container-low font-title-md font-semibold">Vazgeç</a>
+                        <button type="submit" class="inline-flex items-center gap-space-xs px-space-xl py-2.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-title-md font-semibold">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            Fikstüre kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-md p-space-lg">
+            <h3 class="font-headline-sm text-on-surface mb-space-sm">Kayıt</h3>
+            <p class="font-body-sm text-on-surface-variant">Yeni maçta skor yazılmaz. Durum oynanmadı olarak gider. Takım, stadyum ve durum adları API’ye gönderilir.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var home = document.getElementById("homeTeam");
+            var away = document.getElementById("awayTeam");
+            var week = document.getElementById("leagueWeek");
+            var name = document.getElementById("previewMatchName");
+            var sub = document.getElementById("previewMatchSub");
+            function textOf(select) {
+                if (!select || !select.value) return "";
+                return select.options[select.selectedIndex].text;
+            }
+            function logoOf(select, inputId) {
+                var input = document.getElementById(inputId);
+                if (!select || !input) return;
+                var option = select.options[select.selectedIndex];
+                input.value = option ? (option.getAttribute("data-logo") || "") : "";
+            }
+            function updatePreview() {
+                var h = textOf(home);
+                var a = textOf(away);
+                name.textContent = (h || "Ev sahibi") + " vs " + (a || "Deplasman");
+                sub.textContent = week && week.value ? week.value + ". hafta" : "Hafta bekleniyor";
+                logoOf(home, "HomeLogoUrl");
+                logoOf(away, "AwayLogoUrl");
+            }
+            [home, away, week].forEach(function (el) { if (el) el.addEventListener("change", updatePreview); if (el) el.addEventListener("input", updatePreview); });
+            updatePreview();
+        })();
+    </script>
+}

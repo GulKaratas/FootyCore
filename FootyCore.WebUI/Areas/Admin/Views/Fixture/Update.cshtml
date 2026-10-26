@@ -1,0 +1,92 @@
+@model FixtureFormViewModel
+@{
+    ViewData["Title"] = "Fikstür Güncelle";
+    Layout = "~/Areas/Admin/Views/Admin/_IndexLayout.cshtml";
+    var score = (Model.HomeScore.HasValue && Model.AwayScore.HasValue)
+        ? Model.HomeScore + " - " + Model.AwayScore
+        : "—";
+}
+
+<div class="flex flex-col w-full">
+    <nav class="flex items-center gap-space-xs font-label-md text-on-surface-variant mb-space-md">
+        <a class="hover:text-primary" href="/Admin/Fixture">Fikstür</a>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span class="text-primary font-semibold">Maç düzenle #@Model.MatchId</span>
+    </nav>
+
+    <div class="mb-space-xl">
+        <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Fikstür kaydını güncelle</h1>
+        <p class="font-body-md text-on-surface-variant">@Model.HomeTeamName vs @Model.AwayTeamName</p>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-space-xl">
+        <div class="xl:col-span-8 flex flex-col gap-space-xl">
+            <div class="rounded-xl bg-primary text-on-primary p-space-xl shadow-md">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-space-lg">
+                    <span class="font-headline-sm">@Model.HomeTeamName</span>
+                    <span class="font-headline-lg font-bold">@score</span>
+                    <span class="font-headline-sm">@Model.AwayTeamName</span>
+                </div>
+                <div class="mt-space-sm font-label-sm uppercase tracking-wider">@Model.StatusName · @Model.StadiumName</div>
+            </div>
+
+            <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl">
+                <h2 class="font-headline-sm text-primary mb-space-lg">Müsabaka bilgileri</h2>
+                <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+                    <input type="hidden" asp-for="MatchId" />
+                    <input type="hidden" asp-for="HomeLogoUrl" />
+                    <input type="hidden" asp-for="AwayLogoUrl" />
+                    <input type="hidden" asp-for="HomeScore" />
+                    <input type="hidden" asp-for="AwayScore" />
+
+                    <div class="flex flex-col gap-space-xs">
+                        <label class="font-label-lg font-semibold">Ev sahibi takım</label>
+                        <input asp-for="HomeTeamName" readonly class="w-full h-11 px-3 rounded-lg bg-surface-container-low cursor-not-allowed" />
+                    </div>
+                    <div class="flex flex-col gap-space-xs">
+                        <label class="font-label-lg font-semibold">Deplasman takımı</label>
+                        <input asp-for="AwayTeamName" readonly class="w-full h-11 px-3 rounded-lg bg-surface-container-low cursor-not-allowed" />
+                    </div>
+                    <div class="flex flex-col gap-space-xs">
+                        <label class="font-label-lg font-semibold" asp-for="MatchDate">Maç tarihi ve saati</label>
+                        <input asp-for="MatchDate" type="datetime-local" class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm focus:outline-none" />
+                    </div>
+                    <div class="flex flex-col gap-space-xs">
+                        <label class="font-label-lg font-semibold" asp-for="StatusName">Müsabaka durumu</label>
+                        <select asp-for="StatusName" class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm focus:outline-none">
+                            @foreach (var status in Model.Statuses)
+                            {
+                                <option>@status.StatusName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-space-xs">
+                        <label class="font-label-lg font-semibold" asp-for="Week">Lig haftası</label>
+                        <input asp-for="Week" type="number" min="1" class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm focus:outline-none" />
+                    </div>
+                    <div class="flex flex-col gap-space-xs">
+                        <label class="font-label-lg font-semibold" asp-for="StadiumName">Stadyum</label>
+                        <select asp-for="StadiumName" class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm focus:outline-none">
+                            @foreach (var stadium in Model.Stadiums)
+                            {
+                                <option value="@stadium.StadiumName">@stadium.StadiumName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2 flex items-center justify-end gap-space-sm pt-space-md">
+                        <a href="/Admin/Fixture" class="px-space-xl py-2.5 rounded-lg bg-surface-container-high font-label-lg font-medium">Vazgeç</a>
+                        <button type="submit" class="inline-flex items-center gap-space-xs px-space-xl py-2.5 rounded-lg bg-primary text-on-primary font-label-lg font-semibold">
+                            <span class="material-symbols-outlined text-[18px]">verified</span>
+                            Değişiklikleri kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="xl:col-span-4 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl">
+            <h3 class="font-headline-sm text-primary mb-space-sm">Kayıt</h3>
+            <p class="font-body-sm text-on-surface-variant">Tarih, hafta, stadyum ve durum güncellenir. Skor bu formda değişmez, mevcut skor kayıtla birlikte geri gider.</p>
+        </div>
+    </div>
+</div>

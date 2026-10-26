@@ -1,340 +1,155 @@
-﻿
+@model List<ResultMatchDto>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Fikstür";
     Layout = "~/Areas/Admin/Views/Admin/_IndexLayout.cshtml";
+    var total = Model.Count;
+    var live = Model.Count(x => x.StatusName != null && x.StatusName.Contains("Canlı"));
+    var planned = Model.Count(x => !x.HomeScore.HasValue);
+    var week = total == 0 ? 0 : Model.Max(x => x.Week);
 }
- <div class="main-content">
 
-    <!-- Topbar -->
-
-    <header class="top-bar">
-
-      <div class="d-flex align-items-center gap-3">
-
-        <button class="menu-toggle-btn" id="menuToggle" aria-label="Menüyü Aç/Kapa">
-
-          <i class="bi bi-list"></i>
-
-        </button>
-
-        <div class="top-bar-title">
-
-          <h2 class="">Yeni Maç</h2>
-
-          <p class="">Sezon fikstürüne maç ekle.</p>
-
+<div class="flex flex-col w-full">
+    <div class="flex flex-col gap-space-lg mb-space-xl">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+            <div class="flex flex-col">
+                <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Lig Fikstür Takvimi</h1>
+                <p class="font-body-md text-on-surface-variant mt-space-xs max-w-3xl">Sezon maç programı, stadyum ve başlangıç saati.</p>
+            </div>
+            <div class="flex items-center gap-space-sm self-start md:self-auto">
+                <a href="/Admin/Fixture/Create" class="flex items-center gap-space-xs px-space-lg py-space-sm rounded-lg bg-primary-container text-on-primary hover:bg-primary transition-all shadow-md font-label-lg font-semibold">
+                    <span class="material-symbols-outlined text-title-md">add_circle</span>
+                    <span>Yeni Maç Ekle</span>
+                </a>
+            </div>
         </div>
-
-      </div>
-
-      <div>
-
-        <div class="admin-pill">
-
-          <span class="status-dot"></span>
-
-          <span class="">Admin</span>
-
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+            <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between">
+                <div class="flex flex-col">
+                    <span class="font-label-sm uppercase text-on-surface-variant tracking-wider">Hafta</span>
+                    <span class="font-headline-md text-headline-md text-primary mt-space-xs">@(week). Hafta</span>
+                    <span class="font-body-sm text-secondary font-medium">@total karşılaşma</span>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-secondary-container/50 flex items-center justify-center text-secondary">
+                    <span class="material-symbols-outlined text-headline-sm">calendar_today</span>
+                </div>
+            </div>
+            <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between">
+                <div class="flex flex-col">
+                    <span class="font-label-sm uppercase text-on-surface-variant tracking-wider">Canlı müsabaka</span>
+                    <span class="font-headline-md text-headline-md text-primary mt-space-xs">@live</span>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-error-container/60 flex items-center justify-center text-error">
+                    <span class="material-symbols-outlined text-headline-sm">sports_soccer</span>
+                </div>
+            </div>
+            <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between">
+                <div class="flex flex-col">
+                    <span class="font-label-sm uppercase text-on-surface-variant tracking-wider">Skorsuz</span>
+                    <span class="font-headline-md text-headline-md text-primary mt-space-xs">@planned</span>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary">
+                    <span class="material-symbols-outlined text-headline-sm">schedule</span>
+                </div>
+            </div>
         </div>
-
-      </div>
-
-    </header>
-
-    <div class="content-container">
-
-      <!-- Form Card -->
-
-      <div class="fc-card">
-
-        <div class="fc-card-title">
-
-          <i class="bi bi-plus-circle" style="color: var(--primary-coral);"></i>
-
-          <span class="">Fikstür Bilgileri</span>
-
-        </div>
-
-        <form id="matchForm">
-
-          <div class="row g-3">
-
-            <!-- Sezon -->
-
-            <div class="col-md-6">
-
-              <label class="form-label" for="seasonSelect">Sezon</label>
-
-              <select class="form-select" id="seasonSelect" required="">
-
-                <option value="2024/2025" selected="">2024/2025</option>
-
-                <option value="2025/2026">2025/2026</option>
-
-              </select>
-
-            </div>
-
-            <!-- Hafta -->
-
-            <div class="col-md-6">
-
-              <label class="form-label" for="weekInput">Hafta (1–38)</label>
-
-              <input type="number" class="form-control" id="weekInput" min="1" max="38" value="26" required="">
-
-            </div>
-
-            <!-- Ev Sahibi -->
-
-            <div class="col-md-6">
-
-              <label class="form-label" for="homeTeam">Ev Sahibi</label>
-
-              <select class="form-select" id="homeTeam" required="">
-
-                <option value="Galatasaray" selected="">Galatasaray</option>
-
-                <option value="Fenerbahçe">Fenerbahçe</option>
-
-                <option value="Beşiktaş">Beşiktaş</option>
-
-                <option value="Trabzonspor">Trabzonspor</option>
-
-                <option value="Arsenal">Arsenal</option>
-
-                <option value="Liverpool">Liverpool</option>
-
-                <option value="Manchester City">Manchester City</option>
-
-                <option value="Chelsea">Chelsea</option>
-
-              </select>
-
-            </div>
-
-            <!-- Deplasman -->
-
-            <div class="col-md-6">
-
-              <label class="form-label" for="awayTeam">Deplasman</label>
-
-              <select class="form-select" id="awayTeam" required="">
-
-                <option value="Galatasaray">Galatasaray</option>
-
-                <option value="Fenerbahçe" selected="">Fenerbahçe</option>
-
-                <option value="Beşiktaş">Beşiktaş</option>
-
-                <option value="Trabzonspor">Trabzonspor</option>
-
-                <option value="Arsenal">Arsenal</option>
-
-                <option value="Liverpool">Liverpool</option>
-
-                <option value="Manchester City">Manchester City</option>
-
-                <option value="Chelsea">Chelsea</option>
-
-              </select>
-
-              <div id="sameTeamAlert" class="mt-1" style="display:none; color: var(--card-red); font-size: 0.82rem; font-weight: 600;">
-
-                <i class="bi bi-exclamation-circle-fill me-1"></i> Ev sahibi ile deplasman takımı aynı seçilemez.
-
-              </div>
-
-            </div>
-
-            <!-- Stadyum -->
-
-            <div class="col-md-6">
-
-              <label class="form-label" for="stadiumSelect">Stadyum</label>
-
-              <select class="form-select" id="stadiumSelect" required="">
-
-                <option value="Rams Park" selected="">Rams Park</option>
-
-                <option value="Ülker">Ülker</option>
-
-                <option value="Tüpraş">Tüpraş</option>
-
-                <option value="Papara Park">Papara Park</option>
-
-                <option value="Emirates">Emirates</option>
-
-                <option value="Etihad">Etihad</option>
-
-              </select>
-
-            </div>
-
-            <!-- Tarih ve Saat -->
-
-            <div class="col-md-6">
-
-              <label class="form-label" for="matchDate">Tarih ve Saat</label>
-
-              <input type="datetime-local" class="form-control" id="matchDate" value="2025-03-29T19:00" required="">
-
-            </div>
-
-            <!-- Durum -->
-
-            <div class="col-md-6">
-
-              <label class="form-label" for="statusSelect">Durum</label>
-
-              <select class="form-select" id="statusSelect" required="">
-
-                <option value="Oynanmadı" selected="">Oynanmadı</option>
-
-                <option value="Yaklaşan">Yaklaşan</option>
-
-                <option value="Canlı">Canlı</option>
-
-                <option value="Bitti">Bitti</option>
-
-              </select>
-
-            </div>
-
-            <!-- Form Actions -->
-
-            <div class="col-12 mt-4 pt-2 border-top d-flex justify-content-end gap-2" style="border-color: var(--border-color) !important;">
-
-              <button type="submit" class="btn-coral" id="submitBtn">
-
-                <i class="bi bi-check2-circle"></i> Maçı Kaydet
-
-              </button>
-
-            </div>
-
-          </div>
-
-        </form>
-
-      </div>
-
-      <!-- Son Fikstür Kayıtları Tablosu -->
-
-      <div class="fc-card p-0 overflow-hidden">
-
-        <div class="p-4 pb-3">
-
-          <div class="fc-card-title mb-0">
-
-            <i class="bi bi-clock-history" style="color: var(--secondary-teal);"></i>
-
-            <span class="">Son Eklenen Fikstürler</span>
-
-          </div>
-
-        </div>
-
-        <div class="table-responsive">
-
-          <table class="table fc-table align-middle">
-
-            <thead>
-
-              <tr>
-
-                <th class="">Hafta</th>
-
-                <th class="">Karşılaşma</th>
-
-                <th class="">Stadyum</th>
-
-                <th class="">Tarih</th>
-
-                <th class="">Durum</th>
-
-              <th class="text-end">İşlemler</th></tr>
-
-            </thead>
-
-            <tbody>
-
-              <tr>
-
-                <td class=""><strong>Hafta 26</strong></td>
-
-                <td class="">
-
-                  <span class="fw-semibold">Galatasaray</span> 
-
-                  <span class="text-muted mx-1">vs</span> 
-
-                  <span class="fw-semibold">Fenerbahçe</span>
-
-                </td>
-
-                <td class="">Rams Park</td>
-
-                <td class="">29 Mart 2025, 19:00</td>
-
-                <td class=""><span class="badge-status badge-teal"><i class="bi bi-circle-fill" style="font-size:6px;"></i> Oynanmadı</span></td>
-
-              <td class="text-end"><div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px; color: var(--text-muted);" title="Düzenle"><i class="bi bi-pencil"></i></button><button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px; color: var(--card-red);" title="Sil"><i class="bi bi-trash3"></i></button></div></td></tr>
-
-              <tr>
-
-                <td class=""><strong>Hafta 26</strong></td>
-
-                <td class="">
-
-                  <span class="fw-semibold">Arsenal</span> 
-
-                  <span class="text-muted mx-1">vs</span> 
-
-                  <span class="fw-semibold">Chelsea</span>
-
-                </td>
-
-                <td class="">Emirates</td>
-
-                <td class="">30 Mart 2025, 18:30</td>
-
-                <td class=""><span class="badge-status badge-amber"><i class="bi bi-lightning-charge-fill" style="font-size:8px;"></i> Yaklaşan</span></td>
-
-              <td class="text-end"><div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px; color: var(--text-muted);" title="Düzenle"><i class="bi bi-pencil"></i></button><button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px; color: var(--card-red);" title="Sil"><i class="bi bi-trash3"></i></button></div></td></tr>
-
-              <tr>
-
-                <td class=""><strong>Hafta 25</strong></td>
-
-                <td class="">
-
-                  <span class="fw-semibold">Beşiktaş</span> 
-
-                  <span class="text-muted mx-1">vs</span> 
-
-                  <span class="fw-semibold">Trabzonspor</span>
-
-                </td>
-
-                <td class="">Tüpraş</td>
-
-                <td class="">22 Mart 2025, 20:00</td>
-
-                <td class=""><span class="badge-status badge-green"><i class="bi bi-check-circle-fill" style="font-size:8px;"></i> Bitti</span></td>
-
-              <td class="text-end"><div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px; color: var(--text-muted);" title="Düzenle"><i class="bi bi-pencil"></i></button><button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px; color: var(--card-red);" title="Sil"><i class="bi bi-trash3"></i></button></div></td></tr>
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
     </div>
 
-  </div>
-
+    <div class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden flex flex-col">
+        <div class="p-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
+            <div class="flex flex-col">
+                <h2 class="font-headline-sm text-headline-sm text-primary tracking-tight">Maç listesi</h2>
+                <span class="font-body-sm text-on-surface-variant">Ev sahibi, deplasman, stadyum ve saat</span>
+            </div>
+            <span class="px-space-md py-space-xs rounded-full bg-surface-container-low text-primary font-label-sm font-semibold uppercase tracking-wider">Toplam @total müsabaka</span>
+        </div>
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-surface-container-low text-on-surface-variant font-label-sm uppercase tracking-wider">
+                        <th class="py-space-md px-space-lg font-semibold">Durum</th>
+                        <th class="py-space-md px-space-md font-semibold">Tarih ve saat</th>
+                        <th class="py-space-md px-space-md font-semibold text-right">Ev sahibi</th>
+                        <th class="py-space-md px-space-md font-semibold text-center">Skor / saat</th>
+                        <th class="py-space-md px-space-md font-semibold">Deplasman</th>
+                        <th class="py-space-md px-space-md font-semibold">Stadyum</th>
+                        <th class="py-space-md px-space-lg font-semibold text-right">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-container-low text-on-surface">
+                    @if (total == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="py-space-lg px-space-lg text-on-surface-variant">Kayıtlı maç yok.</td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        var isLive = item.StatusName != null && item.StatusName.Contains("Canlı");
+                        var isDone = item.StatusName != null && item.StatusName.Contains("Bitti");
+                        var hasScore = item.HomeScore.HasValue && item.AwayScore.HasValue;
+                        var homeCode = string.IsNullOrWhiteSpace(item.HomeTeamName) ? "—" : item.HomeTeamName.Substring(0, Math.Min(3, item.HomeTeamName.Length)).ToUpper();
+                        var awayCode = string.IsNullOrWhiteSpace(item.AwayTeamName) ? "—" : item.AwayTeamName.Substring(0, Math.Min(3, item.AwayTeamName.Length)).ToUpper();
+                        <tr class="hover:bg-surface-container-low/60 transition-colors">
+                            <td class="py-space-md px-space-lg whitespace-nowrap">
+                                @if (isLive)
+                                {
+                                    <span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-error-container text-error font-label-sm font-bold">Canlı</span>
+                                }
+                                else if (isDone)
+                                {
+                                    <span class="inline-flex items-center px-space-sm py-0.5 rounded-full bg-surface-container-high font-label-sm font-semibold">Bitti</span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center px-space-sm py-0.5 rounded-full bg-secondary-container/60 text-secondary font-label-sm font-semibold">@item.StatusName</span>
+                                }
+                            </td>
+                            <td class="py-space-md px-space-md whitespace-nowrap">
+                                <div class="flex flex-col">
+                                    <span class="font-title-md font-semibold">@item.MatchDate.ToString("dd.MM.yyyy")</span>
+                                    <span class="font-body-sm text-on-surface-variant">@(item.Week). hafta · @item.MatchDate.ToString("HH:mm")</span>
+                                </div>
+                            </td>
+                            <td class="py-space-md px-space-md whitespace-nowrap text-right">
+                                <div class="inline-flex items-center gap-space-sm justify-end">
+                                    <span class="font-title-md font-bold">@item.HomeTeamName</span>
+                                    <div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center"><span class="font-label-sm font-bold text-primary">@homeCode</span></div>
+                                </div>
+                            </td>
+                            <td class="py-space-md px-space-md text-center">
+                                @if (hasScore)
+                                {
+                                    <span class="inline-flex items-center px-space-md py-1 rounded-lg bg-primary-container text-on-primary font-headline-sm font-bold">@item.HomeScore - @item.AwayScore</span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center px-space-md py-1 rounded-lg bg-surface-container-high font-title-md font-bold">@item.MatchDate.ToString("HH:mm")</span>
+                                }
+                            </td>
+                            <td class="py-space-md px-space-md whitespace-nowrap">
+                                <div class="inline-flex items-center gap-space-sm">
+                                    <div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center"><span class="font-label-sm font-bold text-secondary">@awayCode</span></div>
+                                    <span class="font-title-md font-bold">@item.AwayTeamName</span>
+                                </div>
+                            </td>
+                            <td class="py-space-md px-space-md whitespace-nowrap">
+                                <div class="flex items-center gap-space-xs">
+                                    <span class="material-symbols-outlined text-title-md text-secondary">location_on</span>
+                                    <span class="font-medium">@item.StadiumName</span>
+                                </div>
+                            </td>
+                            <td class="py-space-md px-space-lg text-right">
+                                <div class="inline-flex items-center gap-space-xs">
+                                    <a href="/Admin/Fixture/Update/@item.MatchId" class="px-space-md py-1 rounded-md bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary font-label-md font-semibold">Düzenle</a>
+                                    <a href="/Admin/Fixture/Delete/@item.MatchId" class="p-1.5 rounded-md text-on-surface-variant hover:text-error hover:bg-error-container/40" data-confirm-delete="Bu maç silinsin mi?">
+                                        <span class="material-symbols-outlined text-title-md">delete</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

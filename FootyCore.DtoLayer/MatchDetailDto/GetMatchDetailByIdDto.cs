@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +11,7 @@ namespace FootyCore.DtoLayer.MatchDetailDto
         public int MatchDetailId { get; set; }
 
         public int MatchId { get; set; }
+        public int TeamId { get; set; }
         public string ActionType { get; set; }
 
         public string Description { get; set; }

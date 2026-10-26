@@ -1,31 +1,53 @@
-﻿ <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <h1><i class="bi bi-shield-shaded" style="color:var(--primary-coral)"></i> Footy<span>Core</span></h1>
-      <span class="brand-badge">Yönetim Paneli</span>
-    </div>
+@{
+    var currentCtrl = ViewContext.RouteData.Values["controller"]?.ToString();
+    var isFixture = currentCtrl == "Fixture";
+    var isScore = currentCtrl == "Score" || currentCtrl == "Match";
+    var isEvent = currentCtrl == "MatchEvent" || currentCtrl == "MatchDetail";
+    var active = "flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-all bg-primary-container text-on-primary font-title-md";
+    var idle = "flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant font-body-md hover:bg-surface-container-high hover:text-on-surface transition-all";
+}
 
-    <ul class="sidebar-nav">
-      <li>
-        <a href="fikstur-ekle.html" class="nav-item-link active">
-          <i class="bi bi-calendar-plus"></i> Fikstür Ekle
+<aside class="fixed left-0 top-0 h-screen w-[248px] bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(48,37,42,0.06)]">
+    <div class="flex flex-col">
+        <a href="@Url.Action("Index", "Fixture", new { area = "Admin" })" class="h-[68px] px-space-lg flex items-center gap-space-sm bg-surface-container-lowest shadow-[0_1px_4px_rgba(48,37,42,0.03)]">
+            <span class="material-symbols-outlined text-primary" style="font-size:32px;">trophy</span>
+            <div class="flex flex-col">
+                <span class="font-headline-sm text-headline-sm text-primary tracking-tight leading-none">FootyCore</span>
+                <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase mt-space-xs font-semibold">LEAGUE MANAGEMENT</span>
+            </div>
         </a>
-      </li>
-      <li>
-        <a href="skor-gir.html" class="nav-item-link">
-          <i class="bi bi-trophy"></i> Skor Gir
-        </a>
-      </li>
-      <li>
-        <a href="mac-olayi.html" class="nav-item-link">
-          <i class="bi bi-lightning-charge"></i> Maç Olayı
-        </a>
-      </li>
-    </ul>
-
-    <div class="p-3 border-top" style="border-color: var(--border-color) !important;">
-      <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.78rem;">
-        <i class="bi bi-info-circle"></i>
-        <span>FootyCore v2.5 Admin</span>
-      </div>
+        <div class="px-space-md py-space-lg">
+            <span class="px-space-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-space-sm font-semibold">Operasyonel Modüller</span>
+            <nav class="flex flex-col gap-space-xs">
+                <a href="@Url.Action("Index", "Fixture", new { area = "Admin" })"
+                   class="@(isFixture ? active : idle)"
+                   aria-current="@(isFixture ? "page" : null)">
+                    <span class="material-symbols-outlined text-title-lg @(isFixture ? "text-on-primary" : "text-secondary")">calendar_month</span>
+                    <span>Fikstür</span>
+                </a>
+                <a href="@Url.Action("Index", "Match", new { area = "Admin" })"
+                   class="@(isScore ? active : idle)"
+                   aria-current="@(isScore ? "page" : null)">
+                    <span class="material-symbols-outlined text-title-lg @(isScore ? "text-on-primary" : "text-secondary")">scoreboard</span>
+                    <span>Skorlar</span>
+                </a>
+                <a href="@Url.Action("Index", "MatchDetail", new { area = "Admin" })"
+                   class="@(isEvent ? active : idle)"
+                   aria-current="@(isEvent ? "page" : null)">
+                    <span class="material-symbols-outlined text-title-lg @(isEvent ? "text-on-primary" : "text-secondary")">sports</span>
+                    <span>Maç Olayları</span>
+                </a>
+            </nav>
+        </div>
     </div>
-  </aside>
+    <div class="p-space-md m-space-md rounded-xl bg-surface-container-low shadow-[0_1px_4px_rgba(48,37,42,0.04)]">
+        <div class="flex items-center justify-between mb-space-xs">
+            <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">Yönetim Paneli</span>
+            <span class="h-2 w-2 rounded-full bg-secondary"></span>
+        </div>
+        <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-label-lg text-secondary">verified_user</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant">Veri Koruma Aktif</span>
+        </div>
+    </div>
+</aside>

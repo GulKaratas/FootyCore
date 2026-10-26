@@ -22,5 +22,6 @@ namespace FootyCore.DtoLayer.StandingDto
         public int GoalDifference { get; set; }
         public int Points { get; set; }
         public string Zone { get; set; }
+        public List<string> Form { get; set; }
     }
 }

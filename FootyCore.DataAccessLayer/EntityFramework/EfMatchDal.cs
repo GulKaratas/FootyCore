@@ -57,6 +57,7 @@ namespace FootyCore.DataAccessLayer.EntityFramework
                 .Include(x => x.AwayTeam)
                 .Include(x => x.Stadium)
                 .Include(x => x.MatchStatus)
+                .Include(x => x.MatchStatistic)
                 .OrderBy(x => x.MatchDate)
                 .ToListAsync();
         }

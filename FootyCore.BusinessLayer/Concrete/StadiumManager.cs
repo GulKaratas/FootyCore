@@ -1,10 +1,21 @@
-﻿using FootyCore.BusinessLayer.Abstract;
+﻿using AutoMapper;
+using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DataAccessLayer.Abstract;
 using FootyCore.DtoLayer.StadiumDto;
 
 namespace FootyCore.BusinessLayer.Concrete
 {
     public class StadiumManager : IStadiumService
     {
+        private readonly IStadiumDal _stadiumDal;
+        private readonly IMapper _mapper;
+
+        public StadiumManager(IStadiumDal stadiumDal, IMapper mapper)
+        {
+            _stadiumDal = stadiumDal;
+            _mapper = mapper;
+        }
+
         public Task TDelete(int id)
         {
             throw new NotImplementedException();
@@ -15,9 +26,10 @@ namespace FootyCore.BusinessLayer.Concrete
             throw new NotImplementedException();
         }
 
-        public Task<List<ResultStadiumDto>> TGetList()
+        public async Task<List<ResultStadiumDto>> TGetList()
         {
-            throw new NotImplementedException();
+            var values = await _stadiumDal.GetList();
+            return _mapper.Map<List<ResultStadiumDto>>(values);
         }
 
         public Task TInsert(CreateStadiumDto dto)

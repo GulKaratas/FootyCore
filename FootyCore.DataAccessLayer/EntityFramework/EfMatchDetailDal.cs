@@ -22,5 +22,13 @@ namespace FootyCore.DataAccessLayer.EntityFramework
                 .OrderBy(x => x.Minute)
                 .ToListAsync();
         }
+
+        public async Task<List<MatchDetail>> GetAllWithTeamAsync()
+        {
+            return await _context.MatchDetails
+                .Include(x => x.Team)
+                .OrderBy(x => x.Minute)
+                .ToListAsync();
+        }
     }
 }

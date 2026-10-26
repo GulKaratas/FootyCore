@@ -61,44 +61,90 @@
 
   <!-- TABLE -->
   <div style="overflow-x:auto;border-radius:var(--r3);border:1px solid var(--border)">
-  <table class="std-table" style="min-width:620px">
+  <table class="std-table" style="min-width:720px">
     <thead>
       <tr>
-                            <tbody>
-                                @foreach (var row in rows)
-                                {
-                                    var gd = row.GoalDifference;
-                                    var gdText = gd > 0 ? "+" + gd : gd.ToString();
-                                    var gdClass = gd > 0 ? "pos" : gd < 0 ? "neg" : "zero";
-                                    var strip = row.Zone == "champ" ? "cl-champ" : row.Zone == "ucl" ? "cl-ucl" : row.Zone == "uel" ? "cl-uel" : row.Zone == "rel" ? "cl-rel" : "cl-none";
-                                    var posClass = row.Zone == "champ" ? "top1" : row.Zone == "ucl" ? "top4" : row.Zone == "uel" ? "euro" : row.Zone == "rel" ? "rel" : "";
-
-                                    <tr class="std-row">
-                                        <td style="padding:0;width:4px"><div class="pos-strip @strip" style="height:44px"></div></td>
-                                        <td><span class="pos-num @posClass">@row.Position</span></td>
-                                        <td>
-                                            <div class="team-cell">
-                                                <div class="t-logo"><img src="@row.LogoUrl" alt="@row.ShortName" /></div>
-                                                <div class="t-name">
-                                                    <span class="t-full">@row.TeamName</span>
-                                                    <span class="t-short">@row.ShortName</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>@row.Played</td>
-                                        <td>@row.Won</td>
-                                        <td>@row.Drawn</td>
-                                        <td>@row.Lost</td>
-                                        <td class="hide-sm">@row.GoalsFor</td>
-                                        <td class="hide-sm">@row.GoalsAgainst</td>
-                                        <td class="@gdClass">@gdText</td>
-                                        <td class="@(row.Zone == "champ" ? "pts-top" : "")">@row.Points</td>
-                                    </tr>
-                                }
-                            </tbody>
+        <th></th>
+        <th>#</th>
+        <th class="team-col">Takım</th>
+        <th>O</th>
+        <th>G</th>
+        <th>B</th>
+        <th>M</th>
+        <th class="hide-sm">A</th>
+        <th class="hide-sm">Y</th>
+        <th>Av</th>
+        <th>Son 5</th>
+        <th>P</th>
       </tr>
     </thead>
-    <tbody id="tableBody"></tbody>
+    <tbody>
+        @{
+            var lastZoneGroup = "";
+        }
+        @if (rows.Count == 0)
+        {
+            <tr class="std-row">
+                <td colspan="12">Bu sezonda bitmiş maç yok.</td>
+            </tr>
+        }
+        @foreach (var row in rows)
+        {
+            var zoneGroup = row.Zone == "champ" || row.Zone == "ucl" ? "ucl"
+                : row.Zone == "uel" ? "uel"
+                : row.Zone == "rel" ? "rel"
+                : "none";
+            if (zoneGroup != lastZoneGroup)
+            {
+                lastZoneGroup = zoneGroup;
+                var zoneLabel = zoneGroup == "ucl" ? "Şampiyonlar Ligi"
+                    : zoneGroup == "uel" ? "UEFA Avrupa Ligi"
+                    : zoneGroup == "rel" ? "Küme Düşme"
+                    : "Diğer";
+                <tr>
+                    <td colspan="12"><div class="zone-lbl">@zoneLabel</div></td>
+                </tr>
+            }
+
+            var gd = row.GoalDifference;
+            var gdText = gd > 0 ? "+" + gd : gd.ToString();
+            var gdClass = gd > 0 ? "pos" : gd < 0 ? "neg" : "zero";
+            var strip = row.Zone == "champ" ? "cl-champ" : row.Zone == "ucl" ? "cl-ucl" : row.Zone == "uel" ? "cl-uel" : row.Zone == "rel" ? "cl-rel" : "cl-none";
+            var posClass = row.Zone == "champ" ? "top1" : row.Zone == "ucl" ? "top4" : row.Zone == "uel" ? "euro" : row.Zone == "rel" ? "rel" : "";
+            var form = row.Form ?? new List<string>();
+
+            <tr class="std-row">
+                <td style="padding:0;width:4px"><div class="pos-strip @strip" style="height:44px"></div></td>
+                <td><span class="pos-num @posClass">@row.Position</span></td>
+                <td>
+                    <div class="team-cell">
+                        <div class="t-logo"><img src="@row.LogoUrl" alt="@row.ShortName" /></div>
+                        <div class="t-name">
+                            <span class="t-full">@row.TeamName</span>
+                            <span class="t-short">@row.ShortName</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="s-mp">@row.Played</td>
+                <td class="s-w">@row.Won</td>
+                <td class="s-d">@row.Drawn</td>
+                <td class="s-l">@row.Lost</td>
+                <td class="s-gf hide-sm">@row.GoalsFor</td>
+                <td class="s-ga hide-sm">@row.GoalsAgainst</td>
+                <td class="s-gd @gdClass">@gdText</td>
+                <td>
+                    <div class="form-row">
+                        @foreach (var mark in form)
+                        {
+                            var formClass = mark == "W" ? "fp-w" : mark == "D" ? "fp-d" : "fp-l";
+                            <div class="fp @formClass">@mark</div>
+                        }
+                    </div>
+                </td>
+                <td class="s-pts @(row.Zone == "champ" ? "pts-top" : "")">@row.Points</td>
+            </tr>
+        }
+    </tbody>
   </table>
   </div>
 

@@ -13,7 +13,10 @@ namespace FootyCore.WebUI.Areas.Admin.Controllers
         {
             return PartialView();
         }
-
+        public PartialViewResult TopbarPartial()
+        {
+            return PartialView();
+        }
         public PartialViewResult SidebarPartial()
         {
             return PartialView();

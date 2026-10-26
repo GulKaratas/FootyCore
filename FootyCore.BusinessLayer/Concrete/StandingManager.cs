@@ -62,12 +62,16 @@ public class StandingManager : IStandingService
                 home.Won++;
                 home.Points += 3;
                 away.Lost++;
+                home.Form.Add("W");
+                away.Form.Add("L");
             }
             else if (awayScore > homeScore)
             {
                 away.Won++;
                 away.Points += 3;
                 home.Lost++;
+                away.Form.Add("W");
+                home.Form.Add("L");
             }
             else
             {
@@ -75,6 +79,16 @@ public class StandingManager : IStandingService
                 away.Drawn++;
                 home.Points++;
                 away.Points++;
+                home.Form.Add("D");
+                away.Form.Add("D");
+            }
+        }
+
+        foreach (var row in rows.Values)
+        {
+            if (row.Form.Count > 5)
+            {
+                row.Form = row.Form.Skip(row.Form.Count - 5).ToList();
             }
         }
 

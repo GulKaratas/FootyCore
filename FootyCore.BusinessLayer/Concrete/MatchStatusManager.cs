@@ -1,16 +1,21 @@
-﻿using FootyCore.BusinessLayer.Abstract;
+using AutoMapper;
+using FootyCore.BusinessLayer.Abstract;
+using FootyCore.DataAccessLayer.Abstract;
 using FootyCore.DtoLayer.MatchStatusDto;
-using FootyCore.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FootyCore.BusinessLayer.Concrete
 {
     public class MatchStatusManager : IMatchStatusService
     {
+        private readonly IMatchStatusDal _matchStatusDal;
+        private readonly IMapper _mapper;
+
+        public MatchStatusManager(IMatchStatusDal matchStatusDal, IMapper mapper)
+        {
+            _matchStatusDal = matchStatusDal;
+            _mapper = mapper;
+        }
+
         public Task TDelete(int id)
         {
             throw new NotImplementedException();
@@ -21,9 +26,10 @@ namespace FootyCore.BusinessLayer.Concrete
             throw new NotImplementedException();
         }
 
-        public Task<List<ResultMatchStatusDto>> TGetList()
+        public async Task<List<ResultMatchStatusDto>> TGetList()
         {
-            throw new NotImplementedException();
+            var values = await _matchStatusDal.GetList();
+            return _mapper.Map<List<ResultMatchStatusDto>>(values);
         }
 
         public Task TInsert(CreateMatchStatusDto dto)

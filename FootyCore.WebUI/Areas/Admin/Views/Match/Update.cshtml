@@ -1,0 +1,168 @@
+@model ScoreFormViewModel
+@{
+    ViewData["Title"] = "Skor Güncelle";
+    Layout = "~/Areas/Admin/Views/Admin/_IndexLayout.cshtml";
+    var home = string.IsNullOrWhiteSpace(Model.HomeTeamName) ? "Ev sahibi" : Model.HomeTeamName;
+    var away = string.IsNullOrWhiteSpace(Model.AwayTeamName) ? "Deplasman" : Model.AwayTeamName;
+    var homePoss = Model.HomePossession < 0 ? 0 : Model.HomePossession > 100 ? 100 : Model.HomePossession;
+    var awayPoss = Model.AwayPossession < 0 ? 0 : Model.AwayPossession > 100 ? 100 : Model.AwayPossession;
+}
+
+<div class="flex flex-col w-full gap-space-xl">
+    <div>
+        <div class="flex items-center gap-space-xs font-label-md text-on-surface-variant mb-space-xs">
+            <a class="hover:text-primary flex items-center gap-1" href="/Admin/Match">
+                <span class="material-symbols-outlined text-body-md">scoreboard</span>
+                <span>Skorlar</span>
+            </a>
+            <span>/</span>
+            <span class="text-primary font-medium">Skor güncelle #@Model.MatchId</span>
+        </div>
+        <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Skor ve istatistik revizyonu</h1>
+        <p class="font-body-md text-on-surface-variant">@home vs @away · @(Model.Week). hafta · @Model.StadiumName</p>
+    </div>
+
+    <form method="post" class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+        <input type="hidden" asp-for="MatchId" />
+        <input type="hidden" asp-for="MatchStatisticId" />
+        <div class="lg:col-span-8 flex flex-col gap-space-xl">
+            <div class="bg-surface-container-lowest rounded-xl shadow-md p-space-xl flex flex-col gap-space-lg">
+                <div class="flex items-center justify-between">
+                    <span class="font-label-sm uppercase tracking-widest text-on-surface-variant font-semibold">Müsabaka skoru</span>
+                    <span class="px-space-md py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm font-semibold">@Model.StadiumName</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-11 items-center gap-space-md">
+                    <div class="md:col-span-5 bg-surface-container-low rounded-xl p-space-lg flex flex-col items-center gap-space-md">
+                        <span class="font-headline-sm text-primary">@home</span>
+                        <div class="flex items-center gap-space-lg">
+                            <button class="w-10 h-10 rounded-lg bg-[#ffdfa0] text-[#23191d] border border-[#867275]" type="button" data-step="homeScore" data-dir="-1"><span class="material-symbols-outlined">remove</span></button>
+                            <input asp-for="HomeScore" class="w-24 h-16 text-center font-display-lg text-[#5a192c] bg-white rounded-xl border border-[#867275] focus:outline-none" id="homeScore" min="0" type="number" />
+                            <button class="w-10 h-10 rounded-lg bg-[#ffdfa0] text-[#23191d] border border-[#867275]" type="button" data-step="homeScore" data-dir="1"><span class="material-symbols-outlined">add</span></button>
+                        </div>
+                    </div>
+                    <div class="md:col-span-1 text-center font-headline-md text-secondary">VS</div>
+                    <div class="md:col-span-5 bg-surface-container-low rounded-xl p-space-lg flex flex-col items-center gap-space-md">
+                        <span class="font-headline-sm text-on-surface">@away</span>
+                        <div class="flex items-center gap-space-lg">
+                            <button class="w-10 h-10 rounded-lg bg-[#ffdfa0] text-[#23191d] border border-[#867275]" type="button" data-step="awayScore" data-dir="-1"><span class="material-symbols-outlined">remove</span></button>
+                            <input asp-for="AwayScore" class="w-24 h-16 text-center font-display-lg text-[#5a192c] bg-white rounded-xl border border-[#867275] focus:outline-none" id="awayScore" min="0" type="number" />
+                            <button class="w-10 h-10 rounded-lg bg-[#ffdfa0] text-[#23191d] border border-[#867275]" type="button" data-step="awayScore" data-dir="1"><span class="material-symbols-outlined">add</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-space-xs">
+                    <span class="font-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Durum</span>
+                    <select asp-for="StatusName" class="h-11 px-space-md rounded-lg bg-white text-[#23191d] border border-[#867275] focus:outline-none max-w-xs">
+                        @foreach (var status in Model.Statuses)
+                        {
+                            <option>@status.StatusName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-surface-container-lowest rounded-xl shadow-md p-space-xl flex flex-col gap-space-lg">
+                <h2 class="font-headline-sm text-primary">İstatistikler</h2>
+                <div class="bg-surface-container-low p-space-md rounded-xl">
+                    <div class="flex items-center justify-between font-label-lg mb-space-sm">
+                        <span class="text-primary">@home %<span id="homePossLabel">@homePoss</span></span>
+                        <span>Topa sahip olma</span>
+                        <span>%<span id="awayPossLabel">@awayPoss</span> @away</span>
+                    </div>
+                    <div class="w-full h-3 bg-surface-container rounded-full overflow-hidden flex">
+                        <div class="h-full bg-primary" id="homePossBar" style="width:@(homePoss)%"></div>
+                        <div class="h-full bg-secondary" id="awayPossBar" style="width:@(awayPoss)%"></div>
+                    </div>
+                    <div class="flex items-center justify-between gap-space-lg pt-space-sm">
+                        <input asp-for="HomePossession" class="w-16 h-8 text-center rounded-lg bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" id="homePossession" max="100" min="0" type="number" />
+                        <input asp-for="AwayPossession" class="w-16 h-8 text-center rounded-lg bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" id="awayPossession" max="100" min="0" type="number" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+                    <div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm">
+                        <span class="font-title-md">Şut</span>
+                        <div class="flex items-center justify-between bg-surface-container-lowest p-space-sm rounded-lg">
+                            <span>@home</span>
+                            <input asp-for="HomeShots" class="w-16 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                        </div>
+                        <div class="flex items-center justify-between bg-surface-container-lowest p-space-sm rounded-lg">
+                            <span>@away</span>
+                            <input asp-for="AwayShots" class="w-16 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm">
+                        <span class="font-title-md">İsabetli şut</span>
+                        <div class="flex items-center justify-between bg-surface-container-lowest p-space-sm rounded-lg">
+                            <span>@home</span>
+                            <input asp-for="HomeShotsOnTarget" class="w-16 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                        </div>
+                        <div class="flex items-center justify-between bg-surface-container-lowest p-space-sm rounded-lg">
+                            <span>@away</span>
+                            <input asp-for="AwayShotsOnTarget" class="w-16 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-low p-space-md rounded-xl flex items-center justify-between">
+                        <span class="font-title-md">İlk yarı</span>
+                        <div class="flex items-center gap-space-sm">
+                            <input asp-for="HomeFirstHalfGoals" class="w-12 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                            <span class="text-[#23191d] font-semibold">-</span>
+                            <input asp-for="AwayFirstHalfGoals" class="w-12 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-low p-space-md rounded-xl flex items-center justify-between">
+                        <span class="font-title-md">İkinci yarı</span>
+                        <div class="flex items-center gap-space-sm">
+                            <input asp-for="HomeSecondHalfGoals" class="w-12 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                            <span class="text-[#23191d] font-semibold">-</span>
+                            <input asp-for="AwaySecondHalfGoals" class="w-12 h-8 text-center rounded-md bg-white text-[#23191d] font-semibold border border-[#867275] focus:outline-none" min="0" type="number" />
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-space-sm">
+                    <a href="/Admin/Match" class="px-space-lg py-space-sm rounded-lg bg-white text-[#23191d] border border-[#867275] font-label-lg">Vazgeç</a>
+                    <button class="px-space-xl py-space-sm rounded-lg bg-primary-container text-on-primary font-label-lg inline-flex items-center gap-2" type="submit">
+                        <span class="material-symbols-outlined">verified</span>
+                        Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-4 bg-surface-container-lowest rounded-xl shadow-md p-space-xl">
+            <h3 class="font-headline-sm text-primary mb-space-sm">@home vs @away</h3>
+            <p class="font-body-sm text-[#23191d]">Güncelleme skoru, durumu ve istatistiği yazar. Takım ve stadyum bu ekranda değişmez.</p>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            document.querySelectorAll("[data-step]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    var input = document.getElementById(button.getAttribute("data-step"));
+                    if (!input) return;
+                    var value = parseInt(input.value || "0", 10) + parseInt(button.getAttribute("data-dir"), 10);
+                    input.value = value < 0 ? 0 : value;
+                });
+            });
+            function paint() {
+                var home = document.getElementById("homePossession");
+                var away = document.getElementById("awayPossession");
+                var h = home ? parseInt(home.value || "0", 10) : 0;
+                var a = away ? parseInt(away.value || "0", 10) : 0;
+                var homeBar = document.getElementById("homePossBar");
+                var awayBar = document.getElementById("awayPossBar");
+                if (homeBar) homeBar.style.width = h + "%";
+                if (awayBar) awayBar.style.width = a + "%";
+                var homeLabel = document.getElementById("homePossLabel");
+                var awayLabel = document.getElementById("awayPossLabel");
+                if (homeLabel) homeLabel.textContent = h;
+                if (awayLabel) awayLabel.textContent = a;
+            }
+            ["homePossession", "awayPossession"].forEach(function (id) {
+                var input = document.getElementById(id);
+                if (input) input.addEventListener("input", paint);
+            });
+        })();
+    </script>
+}
